@@ -45,41 +45,62 @@
         var scoreText;
         var groundLayer, coinLayer;
         var text;
+        var accueil;
 
         var game = new Phaser.Game(config);
 
         function preload() {
+            this.load.image('ground', 'assets/platform.png');
             this.load.image('star', 'assets/star.png');
+            this.load.image('sky', 'assets/sky.png');
             this.load.image('bomb', 'assets/bomb.png');
+            
 
-            // map made with Tiled in JSON format
-            this.load.tilemapTiledJSON('map', 'assets/map.json');
-            // tiles in spritesheet 
-            this.load.spritesheet('tiles', 'assets/tiles.png', { frameWidth: 70, frameHeight: 70 });
+            // // map made with Tiled in JSON format
+            // this.load.tilemapTiledJSON('map', 'assets/map.json');
+            // // tiles in spritesheet 
+            // this.load.spritesheet('tiles', 'assets/tiles.png', { frameWidth: 70, frameHeight: 70 });
 
             //the sprite sheets to control the vampire walk
             this.load.spritesheet('vampire-left', 'assets/vampire-walk/left.png', { frameWidth: 188, frameHeight: 336 });
             this.load.spritesheet('vampire-turn', 'assets/vampire-walk/turn.png', { frameWidth: 188, frameHeight: 336 });
             this.load.spritesheet('vampire-right', 'assets/vampire-walk/right.png', { frameWidth: 188, frameHeight: 336 });
+            this.load.image('accueil', 'assets/accueil.png');
         }
 
         function create() {
 
-            // load the map 
-            map = this.make.tilemap({ key: 'map' });
+            // // load the map 
+            // map = this.make.tilemap({ key: 'map' });
 
-            // tiles for the ground layer
-            var groundTiles = map.addTilesetImage('tiles');
+            // // tiles for the ground layer
+            // var groundTiles = map.addTilesetImage('tiles');
 
-            // create the ground layer
-            groundLayer = map.createDynamicLayer('World', groundTiles, 0, 100);
+            // // create the ground layer
+            // groundLayer = map.createDynamicLayer('World', groundTiles, 0, 100);
 
-            // the vampire will collide with this layer
-            groundLayer.setCollisionByExclusion([-1]);
+            // // the vampire will collide with this layer
+            // groundLayer.setCollisionByExclusion([-1]);
 
-            // set the boundaries of our game world
-            this.physics.world.bounds.width = groundLayer.width;
-            this.physics.world.bounds.height = groundLayer.height;
+            // // set the boundaries of our game world
+            // this.physics.world.bounds.width = groundLayer.width;
+            // this.physics.world.bounds.height = groundLayer.height;
+
+            //  A simple background for our game
+            this.add.image(400, 300, 'sky');
+            
+
+            //  The platforms group contains the ground and the 2 ledges we can jump on
+            platforms = this.physics.add.staticGroup();
+
+            //  Here we create the ground.
+            //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+            platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+            //  Now let's create some ledges
+            platforms.create(600, 400, 'ground');
+            platforms.create(50, 250, 'ground');
+            platforms.create(750, 220, 'ground');
             
 
             // The vampire and its settings
@@ -135,9 +156,9 @@
             scoreText = this.add.text(16, 100, 'score: 0', { fontSize: '32px', fill: '#000' });
 
             //  Collide the vampire and the stars with the platforms
-            this.physics.add.collider(vampire, groundLayer);
-            this.physics.add.collider(stars, groundLayer);
-            this.physics.add.collider(bombs, groundLayer);
+            this.physics.add.collider(vampire, platforms);
+            this.physics.add.collider(stars, platforms);
+            this.physics.add.collider(bombs, platforms);
 
             // set bounds so the camera won't go outside the game world
             this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -151,9 +172,22 @@
             this.physics.add.overlap(vampire, stars, collectStar, null, this);
 
             this.physics.add.collider(vampire, bombs, hitBomb, null, this);
+
+            accueil = this.add.sprite(400, 300, 'accueil');
         }
 
-        function update() {
+        var etat=0;
+
+        function update ()
+        {
+
+            if (etat==1){
+                accueil.visible = false
+
+            }else if (etat==0 && cursors.right.isDown){
+                return etat= 1;
+            }
+
             if (gameOver) {
                 return;
             }
