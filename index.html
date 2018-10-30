@@ -46,17 +46,17 @@
         var scoreText;
         var text;
         var accueil;
+        var gameOver;
 
         var game = new Phaser.Game(config);
 
 
-function preload() {
+        function preload() {
             this.load.image('ground', 'assets/platform.png');
-            this.load.image('star', 'assets/star.png');
+            this.load.image('star', 'assets/blood.png');
             this.load.image('sky', 'assets/sky.png');
-            this.load.image('bomb', 'assets/bomb.png');
-            this.load.image('pumpkin', 'assets/pumpkin.png')
-            
+            this.load.image('bomb', 'assets/ail.png');
+            this.load.image('pumpkin', 'assets/pumpkin.png');
 
             // // map made with Tiled in JSON format
             // this.load.tilemapTiledJSON('map', 'assets/map.json');
@@ -68,6 +68,7 @@ function preload() {
             this.load.spritesheet('vampire-turn', 'assets/vampire-walk/turn.png', { frameWidth: 188, frameHeight: 336 });
             this.load.spritesheet('vampire-right', 'assets/vampire-walk/right.png', { frameWidth: 188, frameHeight: 336 });
             this.load.image('accueil', 'assets/accueil.png');
+            this.load.image('gameOver', 'assets/gameOver.png');
         }
 
         function create() {
@@ -99,7 +100,7 @@ function preload() {
                     setXY: { x: 650, y: 40, stepX: 50 }
                 }
             );
-            
+
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
@@ -112,7 +113,7 @@ function preload() {
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
             platforms.create(750, 220, 'ground');
-            
+
 
             // The vampire and its settings
             vampire = this.physics.add.sprite(100, 450, 'vampire-turn');
@@ -150,8 +151,8 @@ function preload() {
             //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
             stars = this.physics.add.group({
                 key: 'star',
-                repeat: 2,
-                setXY: { x: 12, y: 0, stepX: 70 }
+                repeat: 0,
+                setXY: { x: 350, y: 0, stepX: 70 }
             });
 
             stars.children.iterate(function (child) {
@@ -185,22 +186,27 @@ function preload() {
             this.physics.add.overlap(vampire, bombs, hitBomb, null, this);
 
             accueil = this.add.sprite(400, 300, 'accueil');
+            //gameOver = this.add.sprite(400, 300, 'gameOver');
         }
 
-        var etat=0;
+        var etat = 0;
 
-        function update ()
-        {
-
-            if (etat==1){
+        function update() {
+            if (etat >= 1) {
                 accueil.visible = false
 
-            }else if (etat==0 && cursors.right.isDown){
-                return etat= 1;
+            } else if (etat == 0 && cursors.right.isDown) {
+                return etat = 1;
+            }
+
+            // Si il n'y a plus de vie, jeu en pause et gameOver
+            if (pumpkins.countActive(true) === 0) {
+                this.physics.pause();
+                gameOver = true;
             }
 
             if (gameOver) {
-                return;
+                return this.add.sprite(400, 300, 'gameOver');;
             }
 
             if (cursors.left.isDown) {
@@ -255,7 +261,7 @@ function preload() {
                 bomb.disableBody(true, true);
                 bomb === false;
             }
-            
+
             // Tant qu'il reste des lives, si on touche une bombe, une live disparaît
             live = pumpkins.getFirstAlive();
 
@@ -264,8 +270,6 @@ function preload() {
                 live === false;
             }
 
-            
-            //this.physics.pause();
 
             //vampire.setTint('blue');
 
