@@ -106,7 +106,7 @@
             // The vampire and its settings
             vampire = this.physics.add.sprite(100, 450, 'vampire-turn');
             // Set the scale to minify the size of the vampire
-            vampire.setScale(0.3, 0.3);
+            vampire.setScale(0.25, 0.25);
 
             //  vampire physics properties. Give the little guy a slight bounce.
             vampire.setBounce(0.2);
@@ -160,13 +160,13 @@
             this.physics.add.collider(stars, platforms);
             this.physics.add.collider(bombs, platforms);
 
-            // set bounds so the camera won't go outside the game world
-            this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-            // make the camera follow the vampire
-            this.cameras.main.startFollow(vampire);
+            // // set bounds so the camera won't go outside the game world
+            // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+            // // make the camera follow the vampire
+            // this.cameras.main.startFollow(vampire);
 
-            // set background color, so the sky is not black    
-            this.cameras.main.setBackgroundColor('#ccccff');
+            // // set background color, so the sky is not black    
+            // this.cameras.main.setBackgroundColor('#ccccff');
 
             //  Checks to see if the vampire overlaps with any of the stars, if he does call the collectStar function
             this.physics.add.overlap(vampire, stars, collectStar, null, this);
