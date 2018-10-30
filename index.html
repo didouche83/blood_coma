@@ -9,13 +9,13 @@
         body {
             margin: 0;
         }
+
     </style>
 </head>
 
 <body>
 
     <script type="text/javascript">
-
         var config = {
             type: Phaser.AUTO,
             width: 800,
@@ -23,7 +23,9 @@
             physics: {
                 default: 'arcade',
                 arcade: {
-                    gravity: { y: 500 },
+                    gravity: {
+                        y: 500
+                    },
                     debug: false
                 }
             },
@@ -50,13 +52,13 @@
         var game = new Phaser.Game(config);
 
 
-function preload() {
+        function preload() {
             this.load.image('ground', 'assets/platform.png');
             this.load.image('star', 'assets/star.png');
             this.load.image('sky', 'assets/sky.png');
             this.load.image('bomb', 'assets/bomb.png');
             this.load.image('pumpkin', 'assets/pumpkin.png')
-            
+
 
             // // map made with Tiled in JSON format
             // this.load.tilemapTiledJSON('map', 'assets/map.json');
@@ -64,9 +66,18 @@ function preload() {
             // this.load.spritesheet('tiles', 'assets/tiles.png', { frameWidth: 70, frameHeight: 70 });
 
             //the sprite sheets to control the vampire walk
-            this.load.spritesheet('vampire-left', 'assets/vampire-walk/left.png', { frameWidth: 188, frameHeight: 336 });
-            this.load.spritesheet('vampire-turn', 'assets/vampire-walk/turn.png', { frameWidth: 188, frameHeight: 336 });
-            this.load.spritesheet('vampire-right', 'assets/vampire-walk/right.png', { frameWidth: 188, frameHeight: 336 });
+            this.load.spritesheet('vampire-left', 'assets/vampire-walk/left.png', {
+                frameWidth: 188,
+                frameHeight: 336
+            });
+            this.load.spritesheet('vampire-turn', 'assets/vampire-walk/turn.png', {
+                frameWidth: 188,
+                frameHeight: 336
+            });
+            this.load.spritesheet('vampire-right', 'assets/vampire-walk/right.png', {
+                frameWidth: 188,
+                frameHeight: 336
+            });
             this.load.image('accueil', 'assets/accueil.png');
         }
 
@@ -92,14 +103,16 @@ function preload() {
             this.add.image(400, 300, 'sky');
 
             // Groupe statique de 3 pumpkins espacées de 50px
-            pumpkins = this.physics.add.staticGroup(
-                {
-                    key: 'pumpkin',
-                    repeat: 2,
-                    setXY: { x: 650, y: 40, stepX: 50 }
+            pumpkins = this.physics.add.staticGroup({
+                key: 'pumpkin',
+                repeat: 2,
+                setXY: {
+                    x: 650,
+                    y: 40,
+                    stepX: 50
                 }
-            );
-            
+            });
+
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
@@ -112,7 +125,7 @@ function preload() {
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
             platforms.create(750, 220, 'ground');
-            
+
 
             // The vampire and its settings
             vampire = this.physics.add.sprite(100, 450, 'vampire-turn');
@@ -126,32 +139,46 @@ function preload() {
             //  Our vampire animations, turning, walking left and walking right.
             this.anims.create({
                 key: 'left',
-                frames: this.anims.generateFrameNumbers('vampire-left', { start: 0, end: 7 }),
+                frames: this.anims.generateFrameNumbers('vampire-left', {
+                    start: 0,
+                    end: 7
+                }),
                 frameRate: 10,
                 repeat: -1
             });
 
             this.anims.create({
                 key: 'turn',
-                frames: [{ key: 'vampire-turn', frame: 0 }],
+                frames: [{
+                    key: 'vampire-turn',
+                    frame: 0
+                }],
                 frameRate: 20
             });
 
             this.anims.create({
                 key: 'right',
-                frames: this.anims.generateFrameNumbers('vampire-right', { start: 0, end: 7 }),
+                frames: this.anims.generateFrameNumbers('vampire-right', {
+                    start: 0,
+                    end: 7
+                }),
                 frameRate: 10,
                 repeat: -1
             });
 
             //  Input Events
             cursors = this.input.keyboard.createCursorKeys();
+            enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
             //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
             stars = this.physics.add.group({
                 key: 'star',
                 repeat: 2,
-                setXY: { x: 12, y: 0, stepX: 70 }
+                setXY: {
+                    x: 12,
+                    y: 0,
+                    stepX: 70
+                }
             });
 
             stars.children.iterate(function (child) {
@@ -164,7 +191,10 @@ function preload() {
             bombs = this.physics.add.group();
 
             //  The score
-            scoreText = this.add.text(16, 100, 'score: 0', { fontSize: '32px', fill: '#000' });
+            scoreText = this.add.text(16, 100, 'score: 0', {
+                fontSize: '32px',
+                fill: '#000'
+            });
 
             //  Collide the vampire and the stars with the platforms
             this.physics.add.collider(vampire, platforms);
@@ -187,16 +217,14 @@ function preload() {
             accueil = this.add.sprite(400, 300, 'accueil');
         }
 
-        var etat=0;
+        var etat = 0;
 
-        function update ()
-        {
+        function update() {
 
-            if (etat==1){
+            if (etat == 1) {
                 accueil.visible = false
-
-            }else if (etat==0 && cursors.right.isDown){
-                return etat= 1;
+            } else if (etat == 0 && enter.isDown) {
+                return etat = 1;
             }
 
             if (gameOver) {
@@ -207,13 +235,11 @@ function preload() {
                 vampire.setVelocityX(-160);
 
                 vampire.anims.play('left', true);
-            }
-            else if (cursors.right.isDown) {
+            } else if (cursors.right.isDown) {
                 vampire.setVelocityX(160);
 
                 vampire.anims.play('right', true);
-            }
-            else {
+            } else {
                 vampire.setVelocityX(0);
 
                 vampire.anims.play('turn');
@@ -255,7 +281,7 @@ function preload() {
                 bomb.disableBody(true, true);
                 bomb === false;
             }
-            
+
             // Tant qu'il reste des lives, si on touche une bombe, une live disparaît
             live = pumpkins.getFirstAlive();
 
@@ -264,7 +290,7 @@ function preload() {
                 live === false;
             }
 
-            
+
             //this.physics.pause();
 
             //vampire.setTint('blue');
