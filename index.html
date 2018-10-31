@@ -6,7 +6,6 @@
     <title>Making your first Phaser 3 Game - Part 10</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
-    <link rel="stylesheet" type='text/css' href='index.css'>
     <style type='text/css'>
         canvas {
             position: relative;
@@ -81,9 +80,10 @@
         var game = new Phaser.Game(config);
 
         function preload() {
+            this.load.image('floor', 'assets/floor.png');
             this.load.image('ground', 'assets/platform.png');
             this.load.image('star', 'assets/star.png');
-            this.load.image('sky', 'assets/sky.png');
+            this.load.image('sky', 'assets/bloodcoma.png');
             this.load.image('bomb', 'assets/bomb.png');
             this.load.image('pumpkin', 'assets/pumpkin.png');
             this.load.image('name_page', 'assets/name_page_name9.png');
@@ -107,13 +107,15 @@
                 frameWidth: 188,
                 frameHeight: 336
             });
+            this.load.spritesheet('vampire-dead', 'assets/disappear.png', { frameWidth: 332, frameHeight: 380 });
+            this.load.atlas('vampire-disappear', 'assets/appear.png', 'assets/appear.json');
             this.load.image('accueil', 'assets/accueil.png');
         }
 
         function create() {
 
             //  A simple background for our game
-            this.add.image(400, 300, 'sky');
+            this.add.image(1250, 300, 'sky');
 
             // Groupe statique de 3 pumpkins espacées de 50px
             pumpkins = this.physics.add.staticGroup({
@@ -125,19 +127,23 @@
                     stepX: 50
                 }
             });
+            //pumpkins.setScrollFactor(0);
 
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
 
             //  Here we create the ground.
-            //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-            platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+            platforms.create(1250, 568, 'floor');
 
             //  Now let's create some ledges
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
             platforms.create(750, 220, 'ground');
+
+            // set the boundaries of our game world
+            this.physics.world.bounds.width = 2500;
+            this.physics.world.bounds.height = 600;
 
             // The vampire and its settings
             vampire = this.physics.add.sprite(100, 450, 'vampire-turn');
@@ -178,6 +184,13 @@
                 repeat: -1
             });
 
+            this.anims.create({
+                key: 'dead',
+                frames: this.anims.generateFrameNumbers('vampire-dead', { start: 0, end: 11 }),
+                frameRate: 10,
+                repeat: 0
+            });
+
             //  Input Events
             cursors = this.input.keyboard.createCursorKeys();
             enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
@@ -185,7 +198,7 @@
             //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
             stars = this.physics.add.group({
                 key: 'star',
-                repeat: 11,
+                repeat: 0,
                 setXY: {
                     x: 12,
                     y: 0,
@@ -205,24 +218,25 @@
             //  The score
             scoreText = this.add.text(16, 16, 'Score: 0', {
                 fontSize: '32px',
-                fill: '#000'
+                fill: 'red'
             });
+            scoreText.setScrollFactor(0);
 
             nameText = this.add.text(16, 50, 'Player: ', {
                 fontSize: '32px',
-                fill: '#000'
+                fill: 'red'
             });
-            console.log('herel', recordedName)
+            nameText.setScrollFactor(0);
 
             //  Collide the vampire and the stars with the platforms
             this.physics.add.collider(vampire, platforms);
             this.physics.add.collider(stars, platforms);
             this.physics.add.collider(bombs, platforms);
 
-            // // set bounds so the camera won't go outside the game world
-            // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-            // // make the camera follow the vampire
-            // this.cameras.main.startFollow(vampire);
+            // set bounds so the camera won't go outside the game world
+            this.cameras.main.setBounds(0, 0, 2500, 600);
+            // make the camera follow the vampire
+            this.cameras.main.startFollow(vampire);
 
             // // set background color, so the sky is not black
             // this.cameras.main.setBackgroundColor('#ccccff');
@@ -317,6 +331,9 @@
         }
 
         function hitBomb(vampire, bomb) {
+
+            vampire.anims.play('dead', true)
+
             if (bomb) {
                 bomb.disableBody(true, true);
                 bomb === false;
