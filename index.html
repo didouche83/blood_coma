@@ -8,24 +8,24 @@
     <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
     <link rel="stylesheet" type='text/css' href='index.css'>
     <style type='text/css'>
+        canvas {
+            position: relative;
 
-    canvas {
-    position: relative;
+        }
 
-    }
-    .invisible{
-    margin-top:130px;
-    margin-left: 280px;
-    z-index:1;
-    position: absolute;
-    }
-    .validationName{
-    margin-top:160px;
-    margin-left: 335px;
-    z-index:1;
-    position: absolute;
-    }
+        .invisible {
+            margin-top: 130px;
+            margin-left: 280px;
+            z-index: 1;
+            position: absolute;
+        }
 
+        .validationName {
+            margin-top: 160px;
+            margin-left: 335px;
+            z-index: 1;
+            position: absolute;
+        }
 
     </style>
 
@@ -34,8 +34,8 @@
 <body>
 
     <form id="invisible">
-        <input type="text" placeholder="Put your name here" id='inputText' class="invisible" >
-        <button class='validationName' onClick="recordingName()" type="submit">Validate</button>
+        <input type="text" placeholder="Put your name here" id='inputText' class="invisible">
+        <button class='validationName' id="button" type="submit">Validate</button>
     </form>
 
     <script type="text/javascript">
@@ -63,7 +63,7 @@
         var pumpkins;
         var name_page;
         var map;
-        var name ="";
+        var name = "";
         var vampire;
         var stars;
         var bombs;
@@ -72,8 +72,15 @@
         var score = 0;
         var gameOver = false;
         var scoreText;
+        var nameText;
         var text;
-        const input = document.getElementById('invisible');
+        var recordedName;
+        const button = document.getElementById('button');
+        const input = document.getElementById('inputText');
+
+
+
+
 
         var game = new Phaser.Game(config);
 
@@ -83,8 +90,8 @@
             this.load.image('star', 'assets/star.png');
             this.load.image('sky', 'assets/sky.png');
             this.load.image('bomb', 'assets/bomb.png');
-            this.load.image('pumpkin', 'assets/pumpkin.png')
-            this.load.image('name_page', 'assets/name_page_name9.png')
+            this.load.image('pumpkin', 'assets/pumpkin.png');
+            this.load.image('name_page', 'assets/name_page_name9.png');
 
 
             // // map made with Tiled in JSON format
@@ -201,10 +208,16 @@
             bombs = this.physics.add.group();
 
             //  The score
-            scoreText = this.add.text(16, 16, 'score: 0', {
+            scoreText = this.add.text(16, 16, 'Score: 0', {
                 fontSize: '32px',
                 fill: '#000'
             });
+
+            nameText = this.add.text(16, 50, 'Player: ', {
+                fontSize: '32px',
+                fill: '#000'
+            });
+            console.log('herel', recordedName)
 
             //  Collide the vampire and the stars with the platforms
             this.physics.add.collider(vampire, platforms);
@@ -227,10 +240,11 @@
             name_page = this.add.sprite(400, 300, 'name_page');
 
             //mettre ici l'input en lui donnant les coordonnées pour qu'il se place comme on veut
-            
+
             accueil = this.add.sprite(400, 300, 'accueil');
 
             // input = game.add.inputField(10, 90);
+
 
         }
 
@@ -241,20 +255,25 @@
 
             if (etat == 0) {
                 input.style.display = 'none';
-            }else if (etat == 1){
+                button.style.display = 'none'
+            } else if (etat == 1) {
                 accueil.visible = false;
                 input.style.display = 'block'
-            }else if (etat ==2){
+                button.style.display = 'block'
+
+            } else if (etat == 2) {
                 name_page.visible = false;
                 input.style.display = 'none';
+                button.style.display = 'none'
             }
 
+         
 
             if (etat == 0 && enter.isDown) {
                 return etat = 1;
             }
 
-            if (etat == 1 && cursors.up.isDown){
+            if (etat == 1 && cursors.up.isDown) {
                 return etat = 2;
             }
 
@@ -281,14 +300,11 @@
                 vampire.setVelocityY(-500);
             }
 
-            function recordingName()
-            {
-            var nameRecorded = document.getElementById("inputText").value;
-            alert(nameRecorded);
-            }  
 
-           
+
         }
+
+
 
         function collectStar(vampire, star) {
             star.disableBody(true, true);
@@ -296,6 +312,8 @@
             //  Add and update the score
             score += 10;
             scoreText.setText('Score: ' + score);
+            nameText.setText('Player: ' + recordedName);
+
 
             if (stars.countActive(true) === 0) {
                 //  A new batch of stars to collect
@@ -336,10 +354,10 @@
             //vampire.anims.play('turn');
 
             //gameOver = true;
-           
+
 
         }
-      
+
 
 
         // function change_class() {
@@ -347,17 +365,15 @@
         //     btn.className = "buttonType2";
 
         // }
+        button.addEventListener("click", function (event) {
+                event.preventDefault()
+                recordedName = input.value;
+                console.log('bb', recordedName)
+            }, );
 
-        
-console.log('name_age', etat)
-            // if(etat == 1){
-            // input.style.display = 'none'
-            // }
-console.log('lo', input)
-console.log('value', this.value)
     </script>
 
- 
+
 
 </body>
 
