@@ -1,0 +1,14 @@
+{ "columns":14,
+ "image":"Layer_0000_9.png",
+ "imageheight":793,
+ "imagewidth":928,
+ "margin":0,
+ "name":"Layer_0000_9",
+ "spacing":0,
+ "tilecount":168,
+ "tiledversion":"2018.09.12",
+ "tileheight":64,
+ "tilewidth":64,
+ "type":"tileset",
+ "version":1.2
+}

@@ -78,9 +78,12 @@
         var gameOver;
         var gameOverImage;
         var recordedName;
+        var bloodCount = 0;
         var deadAnim = false;
+
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
+
 
         var game = new Phaser.Game(config);
 
@@ -118,7 +121,7 @@
                 frameWidth: 332,
                 frameHeight: 380
             });
-            this.load.atlas('vampire-disappear', 'assets/appear.png', 'assets/appear.json');
+
             this.load.image('accueil', 'assets/accueil.png');
             this.load.image('gameOver', 'assets/vampire_bad3.png');
         }
@@ -162,12 +165,18 @@
             platforms = this.physics.add.staticGroup();
 
             //  Here we create the ground.
-            platforms.create(1250, 568, 'floor');
+            platforms.create(1250, 580, 'floor');
 
             //  Now let's create some ledges
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
             platforms.create(750, 220, 'ground');
+            platforms.create(900, 100, 'ground');
+            platforms.create(1250, 300, 'ground');
+            platforms.create(1500, 200, 'ground');
+            platforms.create(1800, 410, 'ground');
+            platforms.create(2200, 100, 'ground');
+            platforms.create(2300, 240, 'ground');
 
             // set the boundaries of our game world
             this.physics.world.bounds.width = 2500;
@@ -216,7 +225,7 @@
                 key: 'dead',
                 frames: this.anims.generateFrameNumbers('vampire-dead', {
                     start: 0,
-                    end: 11
+                    end: 10
                 }),
                 frameRate: 10,
                 repeat: -1
@@ -230,13 +239,8 @@
             //  Some bloods to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
             bloods = this.physics.add.group({
                 key: 'blood',
-                repeat: 0,
-                setXY: {
-                    x: 350,
-                    y: 0,
-                    stepX: 65
-                }
-
+                repeat: 27,
+                setXY: { x: 100, y: 0, stepX: 80 }
             });
 
             bloods.children.iterate(function (child) {
@@ -368,11 +372,11 @@
                     deadAnim = false
                 }
             } else if (cursors.left.isDown) {
-                vampire.setVelocityX(-160);
+                vampire.setVelocityX(-300);
 
                 vampire.anims.play('left', true);
             } else if (cursors.right.isDown) {
-                vampire.setVelocityX(160);
+                vampire.setVelocityX(300);
 
                 vampire.anims.play('right', true);
             } else {
@@ -388,6 +392,7 @@
         }
 
         function collectBlood(vampire, blood) {
+            bloodCount++;
             blood.disableBody(true, true);
 
 
@@ -404,8 +409,23 @@
                     child.enableBody(true, child.x, 0, true, true);
 
                 });
+                bloodCount = 0;
+            }
 
-                var x = (vampire.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+            if (bloodCount % 4 === 0 ) {
+
+                var x = vampire.x;
+                if (x - 600 < 0) {
+                    x = Phaser.Math.Between(0, 600)
+                }
+                else if (x + 600 > 2500) {
+                    x = Phaser.Math.Between(1900, 2500)
+                }
+                else {
+                    x = Phaser.Math.Between(x - 300, x + 300)
+                }
+
+                //var x = (vampire.x < 1250) ? Phaser.Math.Between(1250, 2500) : Phaser.Math.Between(0, 1250);
 
                 var garlic = garlics.create(x, 16, 'garlic');
                 garlic.setBounce(1);
@@ -414,6 +434,7 @@
                 garlic.allowGravity = false;
 
             }
+
         }
 
         function hitGarlic(vampire, garlic) {
@@ -428,9 +449,11 @@
             live = pumpkins.getFirstAlive();
 
             if (live) {
+                
                 live.disableBody(true, true);
                 live === false;
             }
+
         }
 
 
