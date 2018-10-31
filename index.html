@@ -25,7 +25,6 @@
             z-index: 1;
             position: absolute;
         }
-
     </style>
 
 </head>
@@ -124,7 +123,7 @@
             //  A simple background for our game
             this.add.image(1250, 300, 'sky');
 
-            // Groupe statique de 3 pumpkins espacées de 50px
+            // // Groupe statique de 3 pumpkins espacées de 50px
             pumpkins = this.physics.add.staticGroup({
                 key: 'pumpkin',
                 repeat: 2,
@@ -134,8 +133,21 @@
                     stepX: 50
                 }
             });
-            //pumpkins.setScrollFactor(0);
 
+            if (pumpkins) {
+                pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
+                // pump = pumpkins.getFirstAlive();
+            }
+
+
+            // if (pumpkins.countActive(true) === 0) {
+            //     live = pumpkins.getFirstAlive();
+
+            //     if (live) {
+            //         live.disableBody(true, true);
+            //         live === false;
+            //     }
+            // }
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
@@ -272,7 +284,6 @@
         var etat = 0;
 
         function update() {
-
             if (etat == 0) {
                 accueil.visible = true;
                 input.style.display = 'none';
@@ -286,7 +297,7 @@
             } else if (etat == 2) {
                 name_page.visible = false;
                 input.style.display = 'none';
-                button.style.display = 'none'
+                button.style.display = 'none';
             }
 
             //Quand on appuie sur entrer, on arrive sur la page name (état 1)
@@ -300,6 +311,12 @@
                 this.physics.pause(); //Je mets le jeu en pause
                 gameOver = true;
                 gameOverImage = this.add.sprite(400, 300, 'gameOver'); //j'affiche mon image gameOver
+                gameOverImage.setScrollFactor(0);
+                garlics.children.entries.map(garlic => garlic.disableBody(true, true))
+                //garlic.disableBody(true, true);
+                // garlic === false;
+
+                // garlics = false;
             }
 
             // Quand je presse ENTER (=rejouer) :
@@ -309,6 +326,7 @@
                 etat = 2;
                 score = 0; //le score revient à 0...
                 scoreText.setText('Score: ' + score); //...et je l'affiche
+                vampire.setPosition(65, 300);
                 pumpkins = this.physics.add.staticGroup({ //j'affiche 3 pumpkins
                     key: 'pumpkin',
                     repeat: 2,
@@ -318,9 +336,9 @@
                         stepX: 50
                     }
                 });
+                //pumpkins.setScrollFactor(0);
 
             }
-
 
             // if (pumpkins.countActive(true) === 0) {
             //     live = pumpkins.getFirstAlive();
@@ -334,7 +352,6 @@
             if (deadAnim) {
                 vampire.anims.play('dead', true);
                 if (cursors.right.isDown) {
-                    vampire.setVelocityX(-500);
                     deadAnim = false
                 } else if (cursors.up.isDown) {
                     deadAnim = false
@@ -342,6 +359,8 @@
                     deadAnim = false
                 }
             } else if (cursors.left.isDown) {
+
+            if (cursors.left.isDown) {
                 vampire.setVelocityX(-160);
 
                 vampire.anims.play('left', true);
@@ -405,9 +424,6 @@
                 live.disableBody(true, true);
                 live === false;
             }
-
-
-            //      vampire.anims.play('dead', true)
         }
 
 
@@ -416,7 +432,7 @@
             recordedName = input.value;
             return etat = 2;
 
-        }, );
+        });
 
     </script>
 
