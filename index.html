@@ -78,12 +78,7 @@
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
 
-
-
-
-
         var game = new Phaser.Game(config);
-
 
         function preload() {
             this.load.image('ground', 'assets/platform.png');
@@ -245,9 +240,7 @@
 
             // input = game.add.inputField(10, 90);
 
-
         }
-
 
         var etat = 0;
 
@@ -267,16 +260,9 @@
                 button.style.display = 'none'
             }
 
-         
-
             if (etat == 0 && enter.isDown) {
                 return etat = 1;
             }
-
-            if (etat == 1 && cursors.up.isDown) {
-                return etat = 2;
-            }
-
 
             if (gameOver) {
                 return;
@@ -300,11 +286,7 @@
                 vampire.setVelocityY(-500);
             }
 
-
-
         }
-
-
 
         function collectStar(vampire, star) {
             star.disableBody(true, true);
@@ -355,10 +337,7 @@
 
             //gameOver = true;
 
-
         }
-
-
 
         // function change_class() {
         //     var btn = document.getElementById("btnTest");
@@ -366,10 +345,11 @@
 
         // }
         button.addEventListener("click", function (event) {
-                event.preventDefault()
-                recordedName = input.value;
-                console.log('bb', recordedName)
-            }, );
+            event.preventDefault()
+            recordedName = input.value;
+            return etat = 2;
+
+        }, );
 
     </script>
 
