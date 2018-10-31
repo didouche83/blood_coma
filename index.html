@@ -1,9 +1,10 @@
+
 <!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 10</title>
+    <title>Blood coma</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
     <style type='text/css'>
@@ -59,6 +60,7 @@
         };
 
         var accueil;
+        var music
         var pumpkins;
         var name_page;
         var map;
@@ -77,6 +79,8 @@
         var gameOverImage;
         var recordedName;
         var bloodCount = 0;
+        var deadAnim = false;
+
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
 
@@ -91,6 +95,8 @@
             this.load.image('pumpkin', 'assets/pumpkin.png')
             this.load.image('sky', 'assets/bloodcoma.png');
             this.load.image('name_page', 'assets/name_page_name9.png');
+            this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
+
 
 
             // // map made with Tiled in JSON format
@@ -111,18 +117,25 @@
                 frameWidth: 188,
                 frameHeight: 336
             });
-            this.load.spritesheet('vampire-dead', 'assets/disappear.png', { frameWidth: 332, frameHeight: 380 });
-            //this.load.atlas('vampire-disappear', 'assets/appear.png', 'assets/appear.json');
+            this.load.spritesheet('vampire-dead', 'assets/disappear.png', {
+                frameWidth: 332,
+                frameHeight: 380
+            });
+
             this.load.image('accueil', 'assets/accueil.png');
-            this.load.image('gameOver', 'assets/gameOver.png');
+            this.load.image('gameOver', 'assets/vampire_bad3.png');
         }
 
         function create() {
 
             //  A simple background for our game
             this.add.image(1250, 300, 'sky');
+          
+          // Adding some music dude
+            music = this.sound.add('halloweenMusic');
+            music.play();
 
-            // Groupe statique de 3 pumpkins espacées de 50px
+            // // Groupe statique de 3 pumpkins espacées de 50px
             pumpkins = this.physics.add.staticGroup({
                 key: 'pumpkin',
                 repeat: 2,
@@ -132,8 +145,21 @@
                     stepX: 50
                 }
             });
-            //pumpkins.setScrollFactor(0);
 
+            if (pumpkins) {
+                pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
+                // pump = pumpkins.getFirstAlive();
+            }
+
+
+            // if (pumpkins.countActive(true) === 0) {
+            //     live = pumpkins.getFirstAlive();
+
+            //     if (live) {
+            //         live.disableBody(true, true);
+            //         live === false;
+            //     }
+            // }
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
@@ -197,9 +223,12 @@
 
             this.anims.create({
                 key: 'dead',
-                frames: this.anims.generateFrameNumbers('vampire-dead', {start: 0, end: 10 }),
-                repeat: 1,
-                hideOnComplete: true
+                frames: this.anims.generateFrameNumbers('vampire-dead', {
+                    start: 0,
+                    end: 10
+                }),
+                frameRate: 10,
+                repeat: -1
             });
 
             //  Input Events
@@ -212,7 +241,6 @@
                 key: 'blood',
                 repeat: 27,
                 setXY: { x: 100, y: 0, stepX: 80 }
-
             });
 
             bloods.children.iterate(function (child) {
@@ -269,23 +297,22 @@
         var etat = 0;
 
         function update() {
-
             if (etat == 0) {
                 accueil.visible = true;
                 input.style.display = 'none';
                 button.style.display = 'none'
-              
+
             } else if (etat == 1) {
                 accueil.visible = false;
                 input.style.display = 'block'
                 button.style.display = 'block'
-              
+
             } else if (etat == 2) {
                 name_page.visible = false;
                 input.style.display = 'none';
-                button.style.display = 'none'
+                button.style.display = 'none';
             }
-            
+
             //Quand on appuie sur entrer, on arrive sur la page name (état 1)
             if (etat == 0 && enter.isDown) {
                 return etat = 1;
@@ -297,15 +324,22 @@
                 this.physics.pause(); //Je mets le jeu en pause
                 gameOver = true;
                 gameOverImage = this.add.sprite(400, 300, 'gameOver'); //j'affiche mon image gameOver
+                gameOverImage.setScrollFactor(0);
+                garlics.children.entries.map(garlic => garlic.disableBody(true, true))
+                //garlic.disableBody(true, true);
+                // garlic === false;
+
+                // garlics = false;
             }
 
             // Quand je presse ENTER (=rejouer) :
             if (etat == 3 && enter.isDown) {
                 gameOverImage.visible = false; //gameOverImage disparaît
                 this.physics.resume(); //j'appelle la méthode pour annuler la pause
-                etat = 2; 
+                etat = 2;
                 score = 0; //le score revient à 0...
                 scoreText.setText('Score: ' + score); //...et je l'affiche
+                vampire.setPosition(65, 300);
                 pumpkins = this.physics.add.staticGroup({ //j'affiche 3 pumpkins
                     key: 'pumpkin',
                     repeat: 2,
@@ -315,11 +349,9 @@
                         stepX: 50
                     }
                 });
+                //pumpkins.setScrollFactor(0);
 
             }
-
-
-
 
             // if (pumpkins.countActive(true) === 0) {
             //     live = pumpkins.getFirstAlive();
@@ -330,8 +362,16 @@
             //     }
             // }
 
-
-            if (cursors.left.isDown) {
+            if (deadAnim) {
+                vampire.anims.play('dead', true);
+                if (cursors.right.isDown) {
+                    deadAnim = false
+                } else if (cursors.up.isDown) {
+                    deadAnim = false
+                } else if (cursors.left.isDown) {
+                    deadAnim = false
+                }
+            } else if (cursors.left.isDown) {
                 vampire.setVelocityX(-300);
 
                 vampire.anims.play('left', true);
@@ -354,6 +394,7 @@
         function collectBlood(vampire, blood) {
             bloodCount++;
             blood.disableBody(true, true);
+
 
             //  Add and update the score
             score += 10;
@@ -399,6 +440,7 @@
         function hitGarlic(vampire, garlic) {
 
             if (garlic) {
+                deadAnim = true
                 garlic.disableBody(true, true);
                 garlic === false;
 
@@ -411,17 +453,16 @@
                 live.disableBody(true, true);
                 live === false;
             }
-          
-            
+
         }
 
-      
-        button.addEventListener("click", function (event) {
-            event.preventDefault()
-            recordedName = input.value;
-            return etat = 2;
 
-        }, );
+        button.addEventListener("click", function (event) {
+                event.preventDefault()
+                recordedName = input.value;
+                return etat = 2;
+        }
+        )
 
     </script>
 
