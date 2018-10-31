@@ -5,23 +5,37 @@
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-    <style type="text/css" src='index.css'>
-        body {
-            margin: 0;
+    <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
+    <style type='text/css'>
+        canvas {
+            position: relative;
+
         }
 
-        /* .buttonType1 {
-            color: green;
+        .invisible {
+            margin-top: 130px;
+            margin-left: 280px;
+            z-index: 1;
+            position: absolute;
         }
 
-        .buttonType2 {
-            color: red;
-        } */
+        .validationName {
+            margin-top: 160px;
+            margin-left: 335px;
+            z-index: 1;
+            position: absolute;
+        }
 
     </style>
+
 </head>
 
 <body>
+
+    <form id="invisible">
+        <input type="text" placeholder="Put your name here" id='inputText' class="invisible">
+        <button class='validationName' id="button" type="submit">Validate</button>
+    </form>
 
     <script type="text/javascript">
         var config = {
@@ -46,7 +60,9 @@
 
         var accueil;
         var pumpkins;
+        var name_page;
         var map;
+        var name = "";
         var vampire;
         var bloods;
         var garlics;
@@ -55,20 +71,24 @@
         var score = 0;
         var gameOver = false;
         var scoreText;
+        var nameText;
         var text;
         var gameOver;
         var gameOverImage;
+        var recordedName;
+        const button = document.getElementById('button');
+        const input = document.getElementById('inputText');
 
         var game = new Phaser.Game(config);
 
-
         function preload() {
+            this.load.image('floor', 'assets/floor.png');
             this.load.image('ground', 'assets/platform.png');
             this.load.image('blood', 'assets/blood.png');
-            this.load.image('sky', 'assets/sky.png');
             this.load.image('garlic', 'assets/ail.png');
             this.load.image('pumpkin', 'assets/pumpkin.png')
-            this.load.image('name_page', 'assets/accueil_vierge.png')
+            this.load.image('sky', 'assets/bloodcoma.png');
+            this.load.image('name_page', 'assets/name_page_name9.png');
 
 
             // // map made with Tiled in JSON format
@@ -89,6 +109,8 @@
                 frameWidth: 188,
                 frameHeight: 336
             });
+            this.load.spritesheet('vampire-dead', 'assets/disappear.png', { frameWidth: 332, frameHeight: 380 });
+            this.load.atlas('vampire-disappear', 'assets/appear.png', 'assets/appear.json');
             this.load.image('accueil', 'assets/accueil.png');
             this.load.image('gameOver', 'assets/gameOver.png');
         }
@@ -96,7 +118,7 @@
         function create() {
 
             //  A simple background for our game
-            this.add.image(400, 300, 'sky');
+            this.add.image(1250, 300, 'sky');
 
             // Groupe statique de 3 pumpkins espacées de 50px
             pumpkins = this.physics.add.staticGroup({
@@ -108,19 +130,23 @@
                     stepX: 50
                 }
             });
+            //pumpkins.setScrollFactor(0);
 
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
 
             //  Here we create the ground.
-            //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-            platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+            platforms.create(1250, 568, 'floor');
 
             //  Now let's create some ledges
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
             platforms.create(750, 220, 'ground');
+
+            // set the boundaries of our game world
+            this.physics.world.bounds.width = 2500;
+            this.physics.world.bounds.height = 600;
 
             // The vampire and its settings
             vampire = this.physics.add.sprite(65, 300, 'vampire-turn');
@@ -161,6 +187,13 @@
                 repeat: -1
             });
 
+            this.anims.create({
+                key: 'dead',
+                frames: this.anims.generateFrameNumbers('vampire-dead', { start: 0, end: 11 }),
+                frameRate: 10,
+                repeat: 0
+            });
+
             //  Input Events
             cursors = this.input.keyboard.createCursorKeys();
             enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
@@ -171,6 +204,7 @@
                 key: 'blood',
                 repeat: 0,
                 setXY: { x: 350, y: 0, stepX: 65 }
+
             });
 
             bloods.children.iterate(function (child) {
@@ -183,20 +217,27 @@
             garlics = this.physics.add.group();
 
             //  The score
-            scoreText = this.add.text(16, 16, 'score: 0', {
+            scoreText = this.add.text(16, 16, 'Score: 0', {
                 fontSize: '32px',
-                fill: '#000'
+                fill: 'red'
             });
+            scoreText.setScrollFactor(0);
+
+            nameText = this.add.text(16, 50, 'Player: ', {
+                fontSize: '32px',
+                fill: 'red'
+            });
+            nameText.setScrollFactor(0);
 
             //  Collide the vampire and the bloods with the platforms
             this.physics.add.collider(vampire, platforms);
             this.physics.add.collider(bloods, platforms);
             this.physics.add.collider(garlics, platforms);
 
-            // // set bounds so the camera won't go outside the game world
-            // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-            // // make the camera follow the vampire
-            // this.cameras.main.startFollow(vampire);
+            // set bounds so the camera won't go outside the game world
+            this.cameras.main.setBounds(0, 0, 2500, 600);
+            // make the camera follow the vampire
+            this.cameras.main.startFollow(vampire);
 
             // // set background color, so the sky is not black
             // this.cameras.main.setBackgroundColor('#ccccff');
@@ -207,13 +248,15 @@
             //  Checks to see if the vampire overlaps with any of the bloods, if he does call the collectBlood function
             this.physics.add.overlap(vampire, garlics, hitGarlic, null, this);
 
-            // name_page = this.add.sprite(400, 300, 'name_page');
+            name_page = this.add.sprite(400, 300, 'name_page');
 
             //mettre ici l'input en lui donnant les coordonnées pour qu'il se place comme on veut
 
             accueil = this.add.sprite(400, 300, 'accueil');
-        }
 
+            // input = game.add.inputField(10, 90);
+
+        }
 
         var etat = 0;
 
@@ -221,33 +264,38 @@
 
             if (etat == 0) {
                 accueil.visible = true;
+                input.style.display = 'none';
+                button.style.display = 'none'
+              
+            } else if (etat == 1) {
+                accueil.visible = false;
+                input.style.display = 'block'
+                button.style.display = 'block'
+              
+            } else if (etat == 2) {
+                name_page.visible = false;
+                input.style.display = 'none';
+                button.style.display = 'none'
             }
-
+            
+            //Quand on appuie sur entrer, on arrive sur la page name (état 1)
             if (etat == 0 && enter.isDown) {
                 return etat = 1;
             }
 
-            if (etat == 1) {
-                accueil.visible = false;
-
-                //remettre vampire à sa position initiale
-                //remettre une rangée de bloods
-                //remove les ail
-            }
-
             // Quand je n'ai plus de pumpkins
-            if (etat == 1 && pumpkins.countActive(true) === 0) {
-                etat = 2;
+            if (etat == 2 && pumpkins.countActive(true) === 0) {
+                etat = 3;
                 this.physics.pause(); //Je mets le jeu en pause
                 gameOver = true;
                 gameOverImage = this.add.sprite(400, 300, 'gameOver'); //j'affiche mon image gameOver
             }
 
             // Quand je presse ENTER (=rejouer) :
-            if (etat == 2 && enter.isDown) {
+            if (etat == 3 && enter.isDown) {
                 gameOverImage.visible = false; //gameOverImage disparaît
                 this.physics.resume(); //j'appelle la méthode pour annuler la pause
-                etat = 1; 
+                etat = 2; 
                 score = 0; //le score revient à 0...
                 scoreText.setText('Score: ' + score); //...et je l'affiche
                 pumpkins = this.physics.add.staticGroup({ //j'affiche 3 pumpkins
@@ -294,6 +342,7 @@
             if (cursors.up.isDown && vampire.body.onFloor()) {
                 vampire.setVelocityY(-500);
             }
+
         }
 
         function collectBlood(vampire, blood) {
@@ -302,6 +351,8 @@
             //  Add and update the score
             score += 10;
             scoreText.setText('Score: ' + score);
+            nameText.setText('Player: ' + recordedName);
+
 
             if (bloods.countActive(true) === 0) {
                 //  A new batch of bloods to collect
@@ -323,11 +374,12 @@
         }
 
         function hitGarlic(vampire, garlic) {
+
             if (garlic) {
                 garlic.disableBody(true, true);
                 garlic === false;
-            }
 
+            }
             // Tant qu'il reste des lives, si on touche un ail, une live disparaît
             live = pumpkins.getFirstAlive();
 
@@ -335,22 +387,21 @@
                 live.disableBody(true, true);
                 live === false;
             }
-            //vampire.anims.play('turn');
-
+          
+//      vampire.anims.play('dead', true)
         }
 
-        function change_class() {
-            var btn = document.getElementById("btnTest");
-            btn.className = "buttonType2";
-        }
+      
+        button.addEventListener("click", function (event) {
+            event.preventDefault()
+            recordedName = input.value;
+            return etat = 2;
+
+        }, );
 
     </script>
-<!-- 
-    <form>
-         <input class='{name_page ? 'block' : 'hidden'}'>hlkjlk</input> -->
-        <!-- <input type="button" value="Test" class="buttonType1" onclick="change_class()" id="btnTest"> -->
-        <!-- <input type='text' >
-    </form> -->
+
+
 
 </body>
 
