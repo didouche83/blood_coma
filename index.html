@@ -170,13 +170,13 @@
             bloods = this.physics.add.group({
                 key: 'blood',
                 repeat: 0,
-                setXY: { x: 350, y: 0, stepX: 70 }
+                setXY: { x: 350, y: 0, stepX: 65 }
             });
 
             bloods.children.iterate(function (child) {
 
                 //  Give each blood a slightly different bounce
-                child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+                child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
 
             });
 
@@ -232,7 +232,6 @@
                 accueil.visible = false;
 
                 //remettre vampire à sa position initiale
-                //remettre 3 pumpkins
                 //remettre une rangée de bloods
                 //remove les ail
             }
@@ -253,6 +252,8 @@
                 gameOverImage.visible = false;
                 this.physics.resume();
                 etat = 1;
+                score = 0;
+                scoreText.setText('Score: ' + score);
                 pumpkins = this.physics.add.staticGroup({
                     key: 'pumpkin',
                     repeat: 2,
