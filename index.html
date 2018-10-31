@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 
@@ -59,6 +60,7 @@
         };
 
         var accueil;
+        var music
         var pumpkins;
         var name_page;
         var map;
@@ -90,6 +92,8 @@
             this.load.image('pumpkin', 'assets/pumpkin.png')
             this.load.image('sky', 'assets/bloodcoma.png');
             this.load.image('name_page', 'assets/name_page_name9.png');
+            this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
+
 
 
             // // map made with Tiled in JSON format
@@ -123,6 +127,10 @@
 
             //  A simple background for our game
             this.add.image(1250, 300, 'sky');
+          
+          // Adding some music dude
+            music = this.sound.add('halloweenMusic');
+            music.play();
 
             // // Groupe statique de 3 pumpkins espacées de 50px
             pumpkins = this.physics.add.staticGroup({
@@ -413,7 +421,7 @@
             if (garlic) {
                 deadAnim = true
                 garlic.disableBody(true, true);
-                garlic === true;
+                garlic === false;
 
             }
             // Tant qu'il reste des lives, si on touche un ail, une live disparaît
