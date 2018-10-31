@@ -1,9 +1,10 @@
+
 <!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 10</title>
+    <title>Blood coma</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
     <style type='text/css'>
@@ -25,6 +26,7 @@
             z-index: 1;
             position: absolute;
         }
+
     </style>
 
 </head>
@@ -58,7 +60,7 @@
         };
 
         var accueil;
-        var music;
+        var music
         var pumpkins;
         var name_page;
         var map;
@@ -76,6 +78,7 @@
         var gameOver;
         var gameOverImage;
         var recordedName;
+        var deadAnim = false;
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
 
@@ -90,6 +93,7 @@
             this.load.image('sky', 'assets/bloodcoma.png');
             this.load.image('name_page', 'assets/name_page_name9.png');
             this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
+
 
 
             // // map made with Tiled in JSON format
@@ -110,18 +114,21 @@
                 frameWidth: 188,
                 frameHeight: 336
             });
-            this.load.spritesheet('vampire-dead', 'assets/disappear.png', { frameWidth: 332, frameHeight: 380 });
+            this.load.spritesheet('vampire-dead', 'assets/disappear.png', {
+                frameWidth: 332,
+                frameHeight: 380
+            });
             this.load.atlas('vampire-disappear', 'assets/appear.png', 'assets/appear.json');
             this.load.image('accueil', 'assets/accueil.png');
-            this.load.image('gameOver', 'assets/gameOver.png');
+            this.load.image('gameOver', 'assets/vampire_bad3.png');
         }
 
         function create() {
 
             //  A simple background for our game
             this.add.image(1250, 300, 'sky');
-            
-            // Adding some music dude
+          
+          // Adding some music dude
             music = this.sound.add('halloweenMusic');
             music.play();
 
@@ -207,9 +214,12 @@
 
             this.anims.create({
                 key: 'dead',
-                frames: this.anims.generateFrameNumbers('vampire-dead', { start: 0, end: 11 }),
+                frames: this.anims.generateFrameNumbers('vampire-dead', {
+                    start: 0,
+                    end: 11
+                }),
                 frameRate: 10,
-                repeat: 0
+                repeat: -1
             });
 
             //  Input Events
@@ -221,7 +231,11 @@
             bloods = this.physics.add.group({
                 key: 'blood',
                 repeat: 0,
-                setXY: { x: 350, y: 0, stepX: 65 }
+                setXY: {
+                    x: 350,
+                    y: 0,
+                    stepX: 65
+                }
 
             });
 
@@ -335,11 +349,25 @@
 
             }
 
-            //console.log(etat)
+            // if (pumpkins.countActive(true) === 0) {
+            //     live = pumpkins.getFirstAlive();
 
+            //     if (live) {
+            //         live.disableBody(true, true);
+            //         live === false;
+            //     }
+            // }
 
-
-            if (cursors.left.isDown) {
+            if (deadAnim) {
+                vampire.anims.play('dead', true);
+                if (cursors.right.isDown) {
+                    deadAnim = false
+                } else if (cursors.up.isDown) {
+                    deadAnim = false
+                } else if (cursors.left.isDown) {
+                    deadAnim = false
+                }
+            } else if (cursors.left.isDown) {
                 vampire.setVelocityX(-160);
 
                 vampire.anims.play('left', true);
@@ -361,6 +389,7 @@
 
         function collectBlood(vampire, blood) {
             blood.disableBody(true, true);
+
 
             //  Add and update the score
             score += 10;
@@ -390,6 +419,7 @@
         function hitGarlic(vampire, garlic) {
 
             if (garlic) {
+                deadAnim = true
                 garlic.disableBody(true, true);
                 garlic === false;
 
@@ -401,17 +431,15 @@
                 live.disableBody(true, true);
                 live === false;
             }
-
-            //      vampire.anims.play('dead', true)
         }
 
 
         button.addEventListener("click", function (event) {
-            event.preventDefault()
-            recordedName = input.value;
-            return etat = 2;
-
-        });
+                event.preventDefault()
+                recordedName = input.value;
+                return etat = 2;
+        }
+        )
 
     </script>
 
