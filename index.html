@@ -123,7 +123,7 @@
             platforms.create(750, 220, 'ground');
 
             // The vampire and its settings
-            vampire = this.physics.add.sprite(100, 450, 'vampire-turn');
+            vampire = this.physics.add.sprite(65, 300, 'vampire-turn');
             // Set the scale to minify the size of the vampire
             vampire.setScale(0.25, 0.25);
 
@@ -212,7 +212,6 @@
             //mettre ici l'input en lui donnant les coordonnées pour qu'il se place comme on veut
 
             accueil = this.add.sprite(400, 300, 'accueil');
-            //gameOver = this.add.sprite(400, 300, 'gameOver');
         }
 
 
@@ -236,25 +235,22 @@
                 //remove les ail
             }
 
+            // Quand je n'ai plus de pumpkins
             if (etat == 1 && pumpkins.countActive(true) === 0) {
                 etat = 2;
-                this.physics.pause();
+                this.physics.pause(); //Je mets le jeu en pause
                 gameOver = true;
-                gameOverImage = this.add.sprite(400, 300, 'gameOver');
+                gameOverImage = this.add.sprite(400, 300, 'gameOver'); //j'affiche mon image gameOver
             }
 
-            //REVOIR LE GAME OVER ET LES ETATS - ESSAYER  AVEC CURSORS.UP.ISdONW  
-
-            // Si il n'y a plus de vie, jeu en pause et gameOver = true
-
-
+            // Quand je presse ENTER (=rejouer) :
             if (etat == 2 && enter.isDown) {
-                gameOverImage.visible = false;
-                this.physics.resume();
-                etat = 1;
-                score = 0;
-                scoreText.setText('Score: ' + score);
-                pumpkins = this.physics.add.staticGroup({
+                gameOverImage.visible = false; //gameOverImage disparaît
+                this.physics.resume(); //j'appelle la méthode pour annuler la pause
+                etat = 1; 
+                score = 0; //le score revient à 0...
+                scoreText.setText('Score: ' + score); //...et je l'affiche
+                pumpkins = this.physics.add.staticGroup({ //j'affiche 3 pumpkins
                     key: 'pumpkin',
                     repeat: 2,
                     setXY: {
