@@ -25,6 +25,7 @@
             z-index: 1;
             position: absolute;
         }
+
     </style>
 
 </head>
@@ -115,7 +116,7 @@
             });
             this.load.atlas('vampire-disappear', 'assets/appear.png', 'assets/appear.json');
             this.load.image('accueil', 'assets/accueil.png');
-            this.load.image('gameOver', 'assets/gameOver.png');
+            this.load.image('gameOver', 'assets/vampire_bad3.png');
         }
 
         function create() {
@@ -359,8 +360,6 @@
                     deadAnim = false
                 }
             } else if (cursors.left.isDown) {
-
-            if (cursors.left.isDown) {
                 vampire.setVelocityX(-160);
 
                 vampire.anims.play('left', true);
@@ -428,11 +427,11 @@
 
 
         button.addEventListener("click", function (event) {
-            event.preventDefault()
-            recordedName = input.value;
-            return etat = 2;
-
-        });
+                event.preventDefault()
+                recordedName = input.value;
+                return etat = 2;
+        }
+        )
 
     </script>
 
