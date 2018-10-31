@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 10</title>
+    <title>Blood coma</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
     <style type='text/css'>
@@ -75,6 +75,7 @@
         var gameOver;
         var gameOverImage;
         var recordedName;
+        var deadAnim = false;
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
 
@@ -108,7 +109,10 @@
                 frameWidth: 188,
                 frameHeight: 336
             });
-            this.load.spritesheet('vampire-dead', 'assets/disappear.png', { frameWidth: 332, frameHeight: 380 });
+            this.load.spritesheet('vampire-dead', 'assets/disappear.png', {
+                frameWidth: 332,
+                frameHeight: 380
+            });
             this.load.atlas('vampire-disappear', 'assets/appear.png', 'assets/appear.json');
             this.load.image('accueil', 'assets/accueil.png');
             this.load.image('gameOver', 'assets/gameOver.png');
@@ -201,9 +205,12 @@
 
             this.anims.create({
                 key: 'dead',
-                frames: this.anims.generateFrameNumbers('vampire-dead', { start: 0, end: 11 }),
+                frames: this.anims.generateFrameNumbers('vampire-dead', {
+                    start: 0,
+                    end: 11
+                }),
                 frameRate: 10,
-                repeat: 0
+                repeat: -1
             });
 
             //  Input Events
@@ -215,7 +222,11 @@
             bloods = this.physics.add.group({
                 key: 'blood',
                 repeat: 0,
-                setXY: { x: 350, y: 0, stepX: 65 }
+                setXY: {
+                    x: 350,
+                    y: 0,
+                    stepX: 65
+                }
 
             });
 
@@ -329,9 +340,25 @@
 
             }
 
-            //console.log(etat)
+            // if (pumpkins.countActive(true) === 0) {
+            //     live = pumpkins.getFirstAlive();
 
+            //     if (live) {
+            //         live.disableBody(true, true);
+            //         live === false;
+            //     }
+            // }
 
+            if (deadAnim) {
+                vampire.anims.play('dead', true);
+                if (cursors.right.isDown) {
+                    deadAnim = false
+                } else if (cursors.up.isDown) {
+                    deadAnim = false
+                } else if (cursors.left.isDown) {
+                    deadAnim = false
+                }
+            } else if (cursors.left.isDown) {
 
             if (cursors.left.isDown) {
                 vampire.setVelocityX(-160);
@@ -355,6 +382,7 @@
 
         function collectBlood(vampire, blood) {
             blood.disableBody(true, true);
+
 
             //  Add and update the score
             score += 10;
@@ -384,8 +412,9 @@
         function hitGarlic(vampire, garlic) {
 
             if (garlic) {
+                deadAnim = true
                 garlic.disableBody(true, true);
-                garlic === false;
+                garlic === true;
 
             }
             // Tant qu'il reste des lives, si on touche un ail, une live disparaît
@@ -395,8 +424,6 @@
                 live.disableBody(true, true);
                 live === false;
             }
-
-            //      vampire.anims.play('dead', true)
         }
 
 
