@@ -76,8 +76,10 @@
         var gameOver;
         var gameOverImage;
         var recordedName;
+        var bloodCount = 0;
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
+
 
         var game = new Phaser.Game(config);
 
@@ -350,6 +352,7 @@
         }
 
         function collectBlood(vampire, blood) {
+            bloodCount++;
             blood.disableBody(true, true);
 
             //  Add and update the score
@@ -365,10 +368,10 @@
                     child.enableBody(true, child.x, 0, true, true);
 
                 });
-                
+                bloodCount = 0;
             }
 
-            if (bloods.countActive(true) === 18 || bloods.countActive(true) === 8 || bloods.countActive(true) === 0) {
+            if (bloodCount % 4 === 0 ) {
 
                 var x = vampire.x;
                 if (x - 600 < 0) {
