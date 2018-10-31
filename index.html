@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 
@@ -26,7 +25,6 @@
             z-index: 1;
             position: absolute;
         }
-
     </style>
 
 </head>
@@ -130,8 +128,8 @@
 
             //  A simple background for our game
             this.add.image(1250, 300, 'sky');
-          
-          // Adding some music dude
+
+            // Adding some music dude
             music = this.sound.add('halloweenMusic');
             music.play();
 
@@ -148,18 +146,8 @@
 
             if (pumpkins) {
                 pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
-                // pump = pumpkins.getFirstAlive();
             }
 
-
-            // if (pumpkins.countActive(true) === 0) {
-            //     live = pumpkins.getFirstAlive();
-
-            //     if (live) {
-            //         live.disableBody(true, true);
-            //         live === false;
-            //     }
-            // }
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
@@ -297,6 +285,7 @@
         var etat = 0;
 
         function update() {
+
             if (etat == 0) {
                 accueil.visible = true;
                 input.style.display = 'none';
@@ -349,7 +338,7 @@
                         stepX: 50
                     }
                 });
-                //pumpkins.setScrollFactor(0);
+                pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
 
             }
 
@@ -412,7 +401,7 @@
                 bloodCount = 0;
             }
 
-            if (bloodCount % 4 === 0 ) {
+            if (bloodCount % 4 === 0) {
 
                 var x = vampire.x;
                 if (x - 600 < 0) {
@@ -449,7 +438,7 @@
             live = pumpkins.getFirstAlive();
 
             if (live) {
-                
+
                 live.disableBody(true, true);
                 live === false;
             }
@@ -458,9 +447,9 @@
 
 
         button.addEventListener("click", function (event) {
-                event.preventDefault()
-                recordedName = input.value;
-                return etat = 2;
+            event.preventDefault()
+            recordedName = input.value;
+            return etat = 2;
         }
         )
 
