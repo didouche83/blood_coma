@@ -5,23 +5,25 @@
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
+
     <style type="text/css" src='index.css'>
         body {
             margin: 0;
         }
 
-        /* .buttonType1 {
-            color: green;
-        }
-
-        .buttonType2 {
-            color: red;
-        } */
+      
 
     </style>
 </head>
 
 <body>
+
+    <form>
+        <!-- <input class='{name_page ? 'block' : 'hidden'}'>hlkjlk</input>  -->
+       <input type="text" value="Test" class="invisible" onclick="change_class()" id="invisible">
+       
+   </form>
 
     <script type="text/javascript">
         var config = {
@@ -46,6 +48,7 @@
 
         var accueil;
         var pumpkins;
+        var name_page;
         var map;
         var vampire;
         var stars;
@@ -56,6 +59,13 @@
         var gameOver = false;
         var scoreText;
         var text;
+        const input = document.getElementById('invisible');
+
+
+        
+        // var input;
+
+        // this.add.plugin(PhaserInput.Plugin);
 
 
         var game = new Phaser.Game(config);
@@ -207,11 +217,14 @@
 
             this.physics.add.overlap(vampire, bombs, hitBomb, null, this);
 
-            // name_page = this.add.sprite(400, 300, 'name_page');
+            name_page = this.add.sprite(400, 300, 'name_page');
 
             //mettre ici l'input en lui donnant les coordonnées pour qu'il se place comme on veut
-
+            
             accueil = this.add.sprite(400, 300, 'accueil');
+
+            // input = game.add.inputField(10, 90);
+
         }
 
 
@@ -220,10 +233,18 @@
         function update() {
 
             if (etat == 1) {
-                accueil.visible = false
-            } else if (etat == 0 && enter.isDown) {
+                accueil.visible = false;
+                input.style.display = 'block'
+            }else if (etat == 0){
+                input.style.display = 'none';
+
+            } 
+            if (etat == 0 && enter.isDown) {
+                
                 return etat = 1;
+                
             }
+           
 
             if (gameOver) {
                 return;
@@ -246,6 +267,8 @@
             if (cursors.up.isDown && vampire.body.onFloor()) {
                 vampire.setVelocityY(-500);
             }
+
+           
         }
 
         function collectStar(vampire, star) {
@@ -294,20 +317,27 @@
             //vampire.anims.play('turn');
 
             //gameOver = true;
-        }
+           
 
-        function change_class() {
-            var btn = document.getElementById("btnTest");
-            btn.className = "buttonType2";
         }
+      
 
+
+        // function change_class() {
+        //     var btn = document.getElementById("btnTest");
+        //     btn.className = "buttonType2";
+
+        // }
+
+        
+console.log('name_age', etat)
+            // if(etat == 1){
+            // input.style.display = 'none'
+            // }
+console.log('lo', input)
     </script>
-<!-- 
-    <form>
-         <input class='{name_page ? 'block' : 'hidden'}'>hlkjlk</input> -->
-        <!-- <input type="button" value="Test" class="buttonType1" onclick="change_class()" id="btnTest"> -->
-        <!-- <input type='text' >
-    </form> -->
+
+ 
 
 </body>
 
