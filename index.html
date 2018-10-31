@@ -5,10 +5,19 @@
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-    <style type="text/css">
+    <style type="text/css" src='index.css'>
         body {
             margin: 0;
         }
+
+        /* .buttonType1 {
+            color: green;
+        }
+
+        .buttonType2 {
+            color: red;
+        } */
+
     </style>
 </head>
 
@@ -35,6 +44,7 @@
             }
         };
 
+        var accueil;
         var pumpkins;
         var map;
         var vampire;
@@ -46,7 +56,6 @@
         var gameOver = false;
         var scoreText;
         var text;
-        var accueil;
         var gameOver;
         var gameOverImage;
 
@@ -59,11 +68,12 @@
             this.load.image('sky', 'assets/sky.png');
             this.load.image('garlic', 'assets/ail.png');
             this.load.image('pumpkin', 'assets/pumpkin.png')
+            this.load.image('name_page', 'assets/accueil_vierge.png')
 
 
             // // map made with Tiled in JSON format
             // this.load.tilemapTiledJSON('map', 'assets/map.json');
-            // // tiles in spritesheet 
+            // // tiles in spritesheet
             // this.load.spritesheet('tiles', 'assets/tiles.png', { frameWidth: 70, frameHeight: 70 });
 
             //the sprite sheets to control the vampire walk
@@ -84,22 +94,6 @@
         }
 
         function create() {
-
-            // // load the map 
-            // map = this.make.tilemap({ key: 'map' });
-
-            // // tiles for the ground layer
-            // var groundTiles = map.addTilesetImage('tiles');
-
-            // // create the ground layer
-            // groundLayer = map.createDynamicLayer('World', groundTiles, 0, 100);
-
-            // // the vampire will collide with this layer
-            // groundLayer.setCollisionByExclusion([-1]);
-
-            // // set the boundaries of our game world
-            // this.physics.world.bounds.width = groundLayer.width;
-            // this.physics.world.bounds.height = groundLayer.height;
 
             //  A simple background for our game
             this.add.image(400, 300, 'sky');
@@ -127,7 +121,6 @@
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
             platforms.create(750, 220, 'ground');
-
 
             // The vampire and its settings
             vampire = this.physics.add.sprite(100, 450, 'vampire-turn');
@@ -190,7 +183,7 @@
             garlics = this.physics.add.group();
 
             //  The score
-            scoreText = this.add.text(16, 100, 'score: 0', {
+            scoreText = this.add.text(16, 16, 'score: 0', {
                 fontSize: '32px',
                 fill: '#000'
             });
@@ -205,7 +198,7 @@
             // // make the camera follow the vampire
             // this.cameras.main.startFollow(vampire);
 
-            // // set background color, so the sky is not black    
+            // // set background color, so the sky is not black
             // this.cameras.main.setBackgroundColor('#ccccff');
 
             //  Checks to see if the vampire overlaps with any of the bloods, if he does call the collectBlood function
@@ -214,9 +207,14 @@
             //  Checks to see if the vampire overlaps with any of the bloods, if he does call the collectBlood function
             this.physics.add.overlap(vampire, garlics, hitGarlic, null, this);
 
+            // name_page = this.add.sprite(400, 300, 'name_page');
+
+            //mettre ici l'input en lui donnant les coordonnées pour qu'il se place comme on veut
+
             accueil = this.add.sprite(400, 300, 'accueil');
             //gameOver = this.add.sprite(400, 300, 'gameOver');
         }
+
 
         var etat = 0;
 
@@ -340,16 +338,22 @@
                 live.disableBody(true, true);
                 live === false;
             }
-
-
-
-            //vampire.setTint('blue');
-
             //vampire.anims.play('turn');
 
         }
 
+        function change_class() {
+            var btn = document.getElementById("btnTest");
+            btn.className = "buttonType2";
+        }
+
     </script>
+<!-- 
+    <form>
+         <input class='{name_page ? 'block' : 'hidden'}'>hlkjlk</input> -->
+        <!-- <input type="button" value="Test" class="buttonType1" onclick="change_class()" id="btnTest"> -->
+        <!-- <input type='text' >
+    </form> -->
 
 </body>
 
