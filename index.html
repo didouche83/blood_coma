@@ -50,21 +50,24 @@
         var game = new Phaser.Game(config);
 
         function preload() {
+            this.load.image('floor', 'assets/floor.png');
             this.load.image('ground', 'assets/platform.png');
             this.load.image('star', 'assets/star.png');
-            this.load.image('sky', 'assets/sky.png');
+            this.load.image('sky', 'assets/bloodcoma2.png');
             this.load.image('bomb', 'assets/bomb.png');
             
 
             // // map made with Tiled in JSON format
-            // this.load.tilemapTiledJSON('map', 'assets/map.json');
+            // this.load.tilemapTiledJSON('map', 'assets/tilemap0/bloodcoma.json');
             // // tiles in spritesheet 
-            // this.load.spritesheet('tiles', 'assets/tiles.png', { frameWidth: 70, frameHeight: 70 });
+            // this.load.spritesheet('tiles', 'assets/tilemap0/tiles.png' , { frameWidth: 32, frameHeight: 32 });
 
             //the sprite sheets to control the vampire walk
             this.load.spritesheet('vampire-left', 'assets/vampire-walk/left.png', { frameWidth: 188, frameHeight: 336 });
             this.load.spritesheet('vampire-turn', 'assets/vampire-walk/turn.png', { frameWidth: 188, frameHeight: 336 });
             this.load.spritesheet('vampire-right', 'assets/vampire-walk/right.png', { frameWidth: 188, frameHeight: 336 });
+            this.load.spritesheet('vampire-dead', 'assets/disappear.png', { frameWidth: 332, frameHeight: 380 });
+            this.load.atlas('vampire-disappear', 'assets/appear.png', 'assets/appear.json');
             this.load.image('accueil', 'assets/accueil.png');
         }
 
@@ -87,7 +90,7 @@
             // this.physics.world.bounds.height = groundLayer.height;
 
             //  A simple background for our game
-            this.add.image(400, 300, 'sky');
+            this.add.image(1250, 300, 'sky');
             
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -95,13 +98,16 @@
 
             //  Here we create the ground.
             //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-            platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+            platforms.create(1250, 568, 'floor');
 
             //  Now let's create some ledges
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
             platforms.create(750, 220, 'ground');
-            
+
+            // set the boundaries of our game world
+            this.physics.world.bounds.width = 2500;
+            this.physics.world.bounds.height = 600;
 
             // The vampire and its settings
             vampire = this.physics.add.sprite(100, 450, 'vampire-turn');
@@ -133,13 +139,27 @@
                 repeat: -1
             });
 
+            this.anims.create({
+                key: 'dead',
+                frames: this.anims.generateFrameNumbers('vampire-dead', { start: 0, end: 11 }),
+                frameRate: 10,
+                repeat: 0
+            });
+
+            // this.anims.create({
+            //     key: 'dead',
+            //     frames: this.anims.generateFrameNames('vampire-disappear', { prefix: 'appear_', start: 1, end: 12, zeroPad: 0 }),
+            //     frameRate: 12,
+            //     repeat: -1
+            // });
+
             //  Input Events
             cursors = this.input.keyboard.createCursorKeys();
 
             //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
             stars = this.physics.add.group({
                 key: 'star',
-                repeat: 29,
+                repeat: 2,
                 setXY: { x: 12, y: 0, stepX: 70 }
             });
 
@@ -154,16 +174,20 @@
 
             //  The score
             scoreText = this.add.text(16, 100, 'score: 0', { fontSize: '32px', fill: '#000' });
+            scoreText.setScrollFactor(0);
 
             //  Collide the vampire and the stars with the platforms
             this.physics.add.collider(vampire, platforms);
             this.physics.add.collider(stars, platforms);
             this.physics.add.collider(bombs, platforms);
+            // this.physics.add.collider(vampire, groundLayer);
+            // this.physics.add.collider(stars, groundLayer);
+            // this.physics.add.collider(bombs, groundLayer);
 
-            // // set bounds so the camera won't go outside the game world
-            // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-            // // make the camera follow the vampire
-            // this.cameras.main.startFollow(vampire);
+            // set bounds so the camera won't go outside the game world
+            this.cameras.main.setBounds(0, 0, 2500, 600);
+            // make the camera follow the vampire
+            this.cameras.main.startFollow(vampire);
 
             // // set background color, so the sky is not black    
             // this.cameras.main.setBackgroundColor('#ccccff');
@@ -189,6 +213,7 @@
             }
 
             if (gameOver) {
+                
                 return;
             }
 
@@ -242,9 +267,9 @@
         function hitBomb(vampire, bomb) {
             this.physics.pause();
 
-            vampire.setTint(0xff0000);
+            //vampire.setTint(0xff0000);
 
-            vampire.anims.play('turn');
+            vampire.anims.play('dead', true)
 
             gameOver = true;
         }
