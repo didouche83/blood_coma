@@ -129,14 +129,12 @@
                     stepX: 50
                 }
             });
-            
+
             if (pumpkins) {
                 pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
                 // pump = pumpkins.getFirstAlive();
-                    console.log(typeof pumpkins)
-                    console.log(pumpkins)
             }
-            
+
 
             // if (pumpkins.countActive(true) === 0) {
             //     live = pumpkins.getFirstAlive();
@@ -275,7 +273,6 @@
         var etat = 0;
 
         function update() {
-
             if (etat == 0) {
                 accueil.visible = true;
                 input.style.display = 'none';
@@ -289,7 +286,7 @@
             } else if (etat == 2) {
                 name_page.visible = false;
                 input.style.display = 'none';
-                button.style.display = 'none'
+                button.style.display = 'none';
             }
 
             //Quand on appuie sur entrer, on arrive sur la page name (état 1)
@@ -304,6 +301,11 @@
                 gameOver = true;
                 gameOverImage = this.add.sprite(400, 300, 'gameOver'); //j'affiche mon image gameOver
                 gameOverImage.setScrollFactor(0);
+                garlics.children.entries.map(garlic => garlic.disableBody(true, true))
+                //garlic.disableBody(true, true);
+                // garlic === false;
+
+                // garlics = false;
             }
 
             // Quand je presse ENTER (=rejouer) :
@@ -313,12 +315,7 @@
                 etat = 2;
                 score = 0; //le score revient à 0...
                 scoreText.setText('Score: ' + score); //...et je l'affiche
-                vampire.setPosition(65,300);
-                //     setXY: {
-                //         x: 650,
-                //         y: 40,
-                //     },player.position.x = game.width
-                //(65, 300, 'vampire-turn');
+                vampire.setPosition(65, 300);
                 pumpkins = this.physics.add.staticGroup({ //j'affiche 3 pumpkins
                     key: 'pumpkin',
                     repeat: 2,
