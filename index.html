@@ -10,6 +10,7 @@
     <style type='text/css'>
         canvas {
             position: relative;
+            z-index: 1;
 
         }
 
@@ -72,7 +73,7 @@
 <body>
 
 <div>
-    <form method="post" id="invisible" action="index.php">
+    <form method="post" id="together" action="index.php">
         <input type="text" placeholder=" Write your vampire name here" id='inputText' class="invisible" data-message="Please enter 3 letters minimum"
             minlength="3" required />
         <input class='validationName' id="button" type="submit" value="Begin !"/>
@@ -131,7 +132,14 @@
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
         var game = new Phaser.Game(config);
-
+        document.onload = function()
+{
+  setTimeout(function()
+  {
+      console.log('invisible')
+    window.getElementById("together").style.display = "none";
+  }, 2000);
+}
         function preload() {
             this.load.image('floor', 'assets/floor.png');
             this.load.image('ground', 'assets/platform.png');
@@ -167,6 +175,8 @@
 
             this.load.image('accueil', 'assets/accueil.png');
             this.load.image('gameOver', 'assets/vampire_bad3.png');
+
+            
         }
 
         function create() {
@@ -343,9 +353,16 @@
                 accueil.visible = false;
                 input.style.display = 'block'
                 button.style.display = 'block'
+                input.style.zIndex = "2";
+                button.style.zIndex = "2";
+
 
             } else if (etat == 2) {
                 name_page.visible = false;
+                input.style.display = 'none';
+                button.style.display = 'none';
+            }
+            else{
                 input.style.display = 'none';
                 button.style.display = 'none';
             }
