@@ -37,7 +37,8 @@
     "sloc": "node-sloc \"./src\" --include-extensions \"js\"",
     "bundleshaders": "node scripts/bundle-shaders.js",
     "postinstall": "node scripts/support.js",
-    "start": "node phaser.js"
+    "heroku-prebuild": "yarn install --production=false",
+    "start": "yarn run clean && yarn run build && NODE_ENV=production yarn run go"
   },
   "keywords": [
     "2d",
