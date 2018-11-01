@@ -11,13 +11,11 @@
         canvas {
             position: relative;
             z-index: 1;
-
         }
 
         .invisible {
             margin-top: 140px;
             margin-left: 220px;
-            z-index: 1;
             position: absolute;
             width: 330px;
             height: 40px;
@@ -175,8 +173,6 @@
 
             this.load.image('accueil', 'assets/accueil.png');
             this.load.image('gameOver', 'assets/vampire_bad3.png');
-
-            
         }
 
         function create() {
@@ -356,7 +352,6 @@
                 input.style.zIndex = "2";
                 button.style.zIndex = "2";
 
-
             } else if (etat == 2) {
                 name_page.visible = false;
                 input.style.display = 'none';
@@ -512,8 +507,6 @@
         })
 
     </script>
-
-
 
 </body>
 
