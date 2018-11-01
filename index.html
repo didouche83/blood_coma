@@ -57,32 +57,37 @@
             }
         };
 
+        // Elements pages
         var accueil;
-        var music
-        var pumpkins;
-        var name_page;
-        var map;
-        var name = "";
-        var vampire;
-        var bloods;
-        var garlics;
-        var platforms;
-        var cursors;
-        var score = 0;
         var gameOver = false;
-        var scoreText;
-        var nameText;
-        var text;
-        var gameOver;
         var gameOverImage;
-        var recordedName;
-        var bloodCount = 0;
-        var deadAnim = false;
 
+        // Elements texte
+        var name_page;
+        var name = "";
+        var nameText;
+        var scoreText;
+        var score = 0;
+        var text;
+        var recordedName;
+        
+        // Elements principaux
+        var vampire;
+        var deadAnim = false;
+        var bloods;
+        var bloodCount = 0;
+        var garlics;
+        var pumpkins;
+
+        // Elements paysage, decor et ambiance
+        var map;
+        var platforms;
+        var music
+
+        // Autres éléments
+        var cursors;
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
-
-
         var game = new Phaser.Game(config);
 
         function preload() {
@@ -95,11 +100,9 @@
             this.load.image('name_page', 'assets/name_page_name9.png');
             this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
 
-
-
-            // // map made with Tiled in JSON format
+            // map made with Tiled in JSON format
             // this.load.tilemapTiledJSON('map', 'assets/map.json');
-            // // tiles in spritesheet
+            // tiles in spritesheet
             // this.load.spritesheet('tiles', 'assets/tiles.png', { frameWidth: 70, frameHeight: 70 });
 
             //the sprite sheets to control the vampire walk
@@ -133,7 +136,7 @@
             music = this.sound.add('halloweenMusic');
             music.play();
 
-            // // Groupe statique de 3 pumpkins espacées de 50px
+            // Groupe statique de 3 pumpkins espacées de 50px
             pumpkins = this.physics.add.staticGroup({
                 key: 'pumpkin',
                 repeat: 2,
@@ -143,11 +146,11 @@
                     stepX: 50
                 }
             });
-
+            
+            // Fix pumpkins on top right of the screen
             if (pumpkins) {
                 pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
             }
-
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
@@ -172,6 +175,7 @@
 
             // The vampire and its settings
             vampire = this.physics.add.sprite(65, 300, 'vampire-turn');
+
             // Set the scale to minify the size of the vampire
             vampire.setScale(0.25, 0.25);
 
@@ -224,20 +228,19 @@
             enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
             spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACEBAR);
 
-            //  Some bloods to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+            //  Some bloods to collect, 28 in total, evenly spaced 70 pixels apart along the x axis
             bloods = this.physics.add.group({
                 key: 'blood',
                 repeat: 27,
                 setXY: { x: 100, y: 0, stepX: 80 }
             });
 
+            //  Give each blood a slightly different bounce
             bloods.children.iterate(function (child) {
-
-                //  Give each blood a slightly different bounce
                 child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
             });
 
+            // The garlics
             garlics = this.physics.add.group();
 
             //  The score
@@ -260,21 +263,20 @@
 
             // set bounds so the camera won't go outside the game world
             this.cameras.main.setBounds(0, 0, 2500, 600);
+
             // make the camera follow the vampire
             this.cameras.main.startFollow(vampire);
 
-            // // set background color, so the sky is not black
+            // set background color, so the sky is not black
             // this.cameras.main.setBackgroundColor('#ccccff');
 
             //  Checks to see if the vampire overlaps with any of the bloods, if he does call the collectBlood function
             this.physics.add.overlap(vampire, bloods, collectBlood, null, this);
 
-            //  Checks to see if the vampire overlaps with any of the bloods, if he does call the collectBlood function
+            //  Checks to see if the vampire overlaps with any of the bloods, if he does call the hitGarlic function
             this.physics.add.overlap(vampire, garlics, hitGarlic, null, this);
 
             name_page = this.add.sprite(400, 300, 'name_page');
-
-            //mettre ici l'input en lui donnant les coordonnées pour qu'il se place comme on veut
 
             accueil = this.add.sprite(400, 300, 'accueil');
 
@@ -307,7 +309,7 @@
                 return etat = 1;
             }
 
-            // Quand je n'ai plus de pumpkins
+            // Quand je n'ai plus de pumpkins car je viens de perdre
             if (etat == 2 && pumpkins.countActive(true) === 0) {
                 etat = 3;
                 this.physics.pause(); //Je mets le jeu en pause
@@ -315,10 +317,7 @@
                 gameOverImage = this.add.sprite(400, 300, 'gameOver'); //j'affiche mon image gameOver
                 gameOverImage.setScrollFactor(0);
                 garlics.children.entries.map(garlic => garlic.disableBody(true, true))
-                //garlic.disableBody(true, true);
-                // garlic === false;
-
-                // garlics = false;
+                bloods.children.entries.map(blood => blood.disableBody(true, true))
             }
 
             // Quand je presse ENTER (=rejouer) :
@@ -338,19 +337,18 @@
                         stepX: 50
                     }
                 });
+
+                // Fix pumpkins on top right of the screen
                 pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
+                
+                // Faire réapparaître toutes les gouttes de sang
+                bloods.children.iterate(function (child) {
+                    child.enableBody(true, child.x, 0, true, true);
+                });
 
             }
 
-            // if (pumpkins.countActive(true) === 0) {
-            //     live = pumpkins.getFirstAlive();
-
-            //     if (live) {
-            //         live.disableBody(true, true);
-            //         live === false;
-            //     }
-            // }
-
+            // Set directions
             if (deadAnim) {
                 vampire.anims.play('dead', true);
                 if (cursors.right.isDown) {
@@ -380,27 +378,27 @@
 
         }
 
+
         function collectBlood(vampire, blood) {
             bloodCount++;
-            blood.disableBody(true, true);
 
+            // Delete the touched blood
+            blood.disableBody(true, true);
 
             //  Add and update the score
             score += 10;
             scoreText.setText('Score: ' + score);
             nameText.setText('Player: ' + recordedName);
 
-
+            //  A new batch of bloods to collect if there is no blood anymore
             if (bloods.countActive(true) === 0) {
-                //  A new batch of bloods to collect
                 bloods.children.iterate(function (child) {
-
                     child.enableBody(true, child.x, 0, true, true);
-
                 });
                 bloodCount = 0;
             }
 
+            // Where my vampire goes at each new game
             if (bloodCount % 4 === 0) {
 
                 var x = vampire.x;
@@ -413,8 +411,6 @@
                 else {
                     x = Phaser.Math.Between(x - 300, x + 300)
                 }
-
-                //var x = (vampire.x < 1250) ? Phaser.Math.Between(1250, 2500) : Phaser.Math.Between(0, 1250);
 
                 var garlic = garlics.create(x, 16, 'garlic');
                 garlic.setBounce(1);
@@ -430,21 +426,20 @@
 
             if (garlic) {
                 deadAnim = true
+                // Disable garlic if touched
                 garlic.disableBody(true, true);
                 garlic === false;
-
             }
-            // Tant qu'il reste des lives, si on touche un ail, une live disparaît
+
+            // Tant qu'il reste des pumpkins, si on touche un ail, une pumpkin disparaît
             live = pumpkins.getFirstAlive();
 
             if (live) {
-
                 live.disableBody(true, true);
                 live === false;
             }
 
         }
-
 
         button.addEventListener("click", function (event) {
             event.preventDefault()
