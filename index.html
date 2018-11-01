@@ -14,9 +14,12 @@
 
         .invisible {
             margin-top: 130px;
-            margin-left: 280px;
+            margin-left: 200px;
             z-index: 1;
             position: absolute;
+            width: 300px;
+            height: 40px;
+            border-radius: 10px;
         }
 
         .validationName {
@@ -24,16 +27,33 @@
             margin-left: 335px;
             z-index: 1;
             position: absolute;
+            width: 200px;
+            height: 50px;
+            background:url('assets/accueil.png');
+            border: none;
+            cursor: pointer;
+
         }
+
+        .validationName:hover {
+            /* background: url("btnImgHover.gif") no-repeat left bottom; */
+            background: orange;
+        }
+
+        :required {
+            border: 2px orange; 
+        }
+        /* //dotted */
+
     </style>
 
 </head>
 
 <body>
 
-    <form id="invisible">
-        <input type="text" placeholder="Put your name here" id='inputText' class="invisible">
-        <button class='validationName' id="button" type="submit">Validate</button>
+    <form method="post" id="invisible">
+        <input type="text" placeholder="Write your vampire name here" id='inputText' required="required" class="invisible">
+        <input type="button" class='validationName' id="button" type="submit">
     </form>
 
     <script type="text/javascript">
@@ -449,7 +469,10 @@
         button.addEventListener("click", function (event) {
             event.preventDefault()
             recordedName = input.value;
+            if (recordedName != ""){
+
             return etat = 2;
+            }
         }
         )
 
