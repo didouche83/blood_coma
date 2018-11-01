@@ -130,7 +130,14 @@
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
         var game = new Phaser.Game(config);
-
+        document.onload = function()
+{
+  setTimeout(function()
+  {
+      console.log('invisible')
+    window.getElementById("together").style.display = "none";
+  }, 2000);
+}
         function preload() {
             this.load.image('floor', 'assets/floor.png');
             this.load.image('ground', 'assets/platform.png');
@@ -166,7 +173,6 @@
 
             this.load.image('accueil', 'assets/accueil.png');
             this.load.image('gameOver', 'assets/vampire_bad3.png');
-
         }
 
         function create() {
@@ -348,6 +354,10 @@
 
             } else if (etat == 2) {
                 name_page.visible = false;
+                input.style.display = 'none';
+                button.style.display = 'none';
+            }
+            else{
                 input.style.display = 'none';
                 button.style.display = 'none';
             }
