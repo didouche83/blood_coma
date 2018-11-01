@@ -11,8 +11,6 @@
         canvas {
             position: relative;
             z-index: 1;
-
-
         }
 
         .invisible {
@@ -73,7 +71,7 @@
 <body>
 
 <div>
-    <form method="post" id="invisible" action="index.php">
+    <form method="post" id="together" action="index.php">
         <input type="text" placeholder=" Write your vampire name here" id='inputText' class="invisible" data-message="Please enter 3 letters minimum"
             minlength="3" required />
         <input class='validationName' id="button" type="submit" value="Begin !"/>
@@ -168,6 +166,7 @@
 
             this.load.image('accueil', 'assets/accueil.png');
             this.load.image('gameOver', 'assets/vampire_bad3.png');
+
         }
 
         function create() {
@@ -498,8 +497,6 @@
         })
 
     </script>
-
-
 
 </body>
 
