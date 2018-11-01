@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 10</title>
+    <title>Blood coma</title>
+    <link rel="icon" href="assets/favicon.ico" />
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
-    <link rel="stylesheet" type='text/css' href='index.css'>
     <style type='text/css'>
         canvas {
             position: relative;
@@ -14,18 +14,56 @@
         }
 
         .invisible {
-            margin-top: 130px;
-            margin-left: 280px;
+            margin-top: 140px;
+            margin-left: 220px;
             z-index: 1;
             position: absolute;
+            width: 330px;
+            height: 40px;
+            border-radius: 10px;
+            background: url('assets/input_background.png');
+            font-size: 17px;
+            font-weight: bold;
+            color:brown;
+            font-style: italic;
+
+        }
+
+        .invisible:invalid {
+            border: 2px solid brown;
         }
 
         .validationName {
-            margin-top: 160px;
-            margin-left: 335px;
+            margin-top: 220px;
+            margin-left: 305px;
             z-index: 1;
             position: absolute;
+            width: 150px;
+            height: 30px;
+            background: url('assets/button_background.png');
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 0.7s;
+            font-weight: bold;
+            font-size: 17px;
+
         }
+
+        .validationName:hover {
+            background: url("assets/smoke.gif") right top ;
+            color: white;
+        }
+
+        .invisible:focus {
+            background: white
+        }
+
+        /* :required {
+            border: 2px orange; 
+            required pattern="[A-Za-z]{3}"
+        }
+        //dotted */
 
     </style>
 
@@ -33,11 +71,13 @@
 
 <body>
 
-    <form id="invisible">
-        <input type="text" placeholder="Put your name here" id='inputText' class="invisible">
-        <button class='validationName' id="button" type="submit">Validate</button>
+<div>
+    <form method="post" id="invisible" action="index.php">
+        <input type="text" placeholder=" Write your vampire name here" id='inputText' class="invisible" data-message="Please enter 3 letters minimum"
+            minlength="3" required />
+        <input class='validationName' id="button" type="submit" value="Begin !"/>
     </form>
-
+</div>
     <script type="text/javascript">
         var config = {
             type: Phaser.AUTO,
@@ -59,39 +99,52 @@
             }
         };
 
+        // Elements pages
         var accueil;
-        var pumpkins;
-        var name_page;
-        var map;
-        var name = "";
-        var vampire;
-        var stars;
-        var bombs;
-        var platforms;
-        var cursors;
-        var score = 0;
         var gameOver = false;
-        var scoreText;
+        var gameOverImage;
+
+        // Elements texte
+        var name_page;
+        var name = "";
         var nameText;
+        var scoreText;
+        var score = 0;
         var text;
         var recordedName;
+        
+        // Elements principaux
+        var vampire;
+        var deadAnim = false;
+        var bloods;
+        var bloodCount = 0;
+        var garlics;
+        var pumpkins;
+
+        // Elements paysage, decor et ambiance
+        var map;
+        var platforms;
+        var music
+
+        // Autres éléments
+        var cursors;
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
-
         var game = new Phaser.Game(config);
 
         function preload() {
+            this.load.image('floor', 'assets/floor.png');
             this.load.image('ground', 'assets/platform.png');
-            this.load.image('star', 'assets/star.png');
-            this.load.image('sky', 'assets/sky.png');
-            this.load.image('bomb', 'assets/bomb.png');
-            this.load.image('pumpkin', 'assets/pumpkin.png');
-            this.load.image('name_page', 'assets/name_page_name9.png');
+            this.load.image('blood', 'assets/blood.png');
+            this.load.image('garlic', 'assets/ail.png');
+            this.load.image('pumpkin', 'assets/pumpkin.png')
+            this.load.image('sky', 'assets/bloodcoma.png');
+            this.load.image('name_page', 'assets/name_page.png');
+            this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
 
-
-            // // map made with Tiled in JSON format
+            // map made with Tiled in JSON format
             // this.load.tilemapTiledJSON('map', 'assets/map.json');
-            // // tiles in spritesheet
+            // tiles in spritesheet
             // this.load.spritesheet('tiles', 'assets/tiles.png', { frameWidth: 70, frameHeight: 70 });
 
             //the sprite sheets to control the vampire walk
@@ -107,13 +160,23 @@
                 frameWidth: 188,
                 frameHeight: 336
             });
+            this.load.spritesheet('vampire-dead', 'assets/disappear.png', {
+                frameWidth: 332,
+                frameHeight: 380
+            });
+
             this.load.image('accueil', 'assets/accueil.png');
+            this.load.image('gameOver', 'assets/vampire_bad3.png');
         }
 
         function create() {
 
             //  A simple background for our game
-            this.add.image(400, 300, 'sky');
+            this.add.image(1250, 300, 'sky');
+
+            // Adding some music dude
+            music = this.sound.add('halloweenMusic');
+            music.play();
 
             // Groupe statique de 3 pumpkins espacées de 50px
             pumpkins = this.physics.add.staticGroup({
@@ -125,22 +188,36 @@
                     stepX: 50
                 }
             });
-
+            
+            // Fix pumpkins on top right of the screen
+            if (pumpkins) {
+                pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
+            }
 
             //  The platforms group contains the ground and the 2 ledges we can jump on
             platforms = this.physics.add.staticGroup();
 
             //  Here we create the ground.
-            //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-            platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+            platforms.create(1250, 580, 'floor');
 
             //  Now let's create some ledges
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
             platforms.create(750, 220, 'ground');
+            platforms.create(900, 100, 'ground');
+            platforms.create(1250, 300, 'ground');
+            platforms.create(1500, 200, 'ground');
+            platforms.create(1800, 410, 'ground');
+            platforms.create(2200, 100, 'ground');
+            platforms.create(2300, 240, 'ground');
+
+            // set the boundaries of our game world
+            this.physics.world.bounds.width = 2500;
+            this.physics.world.bounds.height = 600;
 
             // The vampire and its settings
-            vampire = this.physics.add.sprite(100, 450, 'vampire-turn');
+            vampire = this.physics.add.sprite(65, 300, 'vampire-turn');
+
             // Set the scale to minify the size of the vampire
             vampire.setScale(0.25, 0.25);
 
@@ -178,69 +255,79 @@
                 repeat: -1
             });
 
+            this.anims.create({
+                key: 'dead',
+                frames: this.anims.generateFrameNumbers('vampire-dead', {
+                    start: 0,
+                    end: 10
+                }),
+                frameRate: 10,
+                repeat: -1
+            });
+
             //  Input Events
             cursors = this.input.keyboard.createCursorKeys();
             enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+            spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACEBAR);
 
-            //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-            stars = this.physics.add.group({
-                key: 'star',
-                repeat: 11,
+            //  Some bloods to collect, 28 in total, evenly spaced 70 pixels apart along the x axis
+            bloods = this.physics.add.group({
+                key: 'blood',
+                repeat: 27,
                 setXY: {
-                    x: 12,
+                    x: 100,
                     y: 0,
-                    stepX: 70
+                    stepX: 80
                 }
             });
 
-            stars.children.iterate(function (child) {
-
-                //  Give each star a slightly different bounce
+            //  Give each blood a slightly different bounce
+            bloods.children.iterate(function (child) {
                 child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
             });
 
-            bombs = this.physics.add.group();
+            // The garlics
+            garlics = this.physics.add.group();
 
             //  The score
             scoreText = this.add.text(16, 16, 'Score: 0', {
                 fontSize: '32px',
-                fontFamily: "Arial",
                 fill: 'red'
             });
+            scoreText.setScrollFactor(0);
 
             nameText = this.add.text(16, 50, 'Player: ', {
                 fontSize: '32px',
-                fill: '#000'
+                fill: 'red'
             });
-            console.log('herel', recordedName)
+            nameText.setScrollFactor(0);
 
-            //  Collide the vampire and the stars with the platforms
+            //  Collide the vampire and the bloods with the platforms
             this.physics.add.collider(vampire, platforms);
-            this.physics.add.collider(stars, platforms);
-            this.physics.add.collider(bombs, platforms);
+            this.physics.add.collider(bloods, platforms);
+            this.physics.add.collider(garlics, platforms);
 
-            // // set bounds so the camera won't go outside the game world
-            // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-            // // make the camera follow the vampire
-            // this.cameras.main.startFollow(vampire);
+            // set bounds so the camera won't go outside the game world
+            this.cameras.main.setBounds(0, 0, 2500, 600);
 
-            // // set background color, so the sky is not black
+            // make the camera follow the vampire
+            this.cameras.main.startFollow(vampire);
+
+            // set background color, so the sky is not black
             // this.cameras.main.setBackgroundColor('#ccccff');
 
-            //  Checks to see if the vampire overlaps with any of the stars, if he does call the collectStar function
-            this.physics.add.overlap(vampire, stars, collectStar, null, this);
+            //  Checks to see if the vampire overlaps with any of the bloods, if he does call the collectBlood function
+            this.physics.add.overlap(vampire, bloods, collectBlood, null, this);
 
-            this.physics.add.overlap(vampire, bombs, hitBomb, null, this);
+            //  Checks to see if the vampire overlaps with any of the bloods, if he does call the hitGarlic function
+            this.physics.add.overlap(vampire, garlics, hitGarlic, null, this);
 
             name_page = this.add.sprite(400, 300, 'name_page');
-
-            //mettre ici l'input en lui donnant les coordonnées pour qu'il se place comme on veut
 
             accueil = this.add.sprite(400, 300, 'accueil');
 
             // input = game.add.inputField(10, 90);
-            
+
         }
 
         var etat = 0;
@@ -248,8 +335,10 @@
         function update() {
 
             if (etat == 0) {
+                accueil.visible = true;
                 input.style.display = 'none';
                 button.style.display = 'none'
+
             } else if (etat == 1) {
                 accueil.visible = false;
                 input.style.display = 'block'
@@ -258,23 +347,69 @@
             } else if (etat == 2) {
                 name_page.visible = false;
                 input.style.display = 'none';
-                button.style.display = 'none'
+                button.style.display = 'none';
             }
 
+            //Quand on appuie sur entrer, on arrive sur la page name (état 1)
             if (etat == 0 && enter.isDown) {
                 return etat = 1;
             }
 
-            if (gameOver) {
-                return;
+            // Quand je n'ai plus de pumpkins car je viens de perdre
+            if (etat == 2 && pumpkins.countActive(true) === 0) {
+                etat = 3;
+                this.physics.pause(); //Je mets le jeu en pause
+                gameOver = true;
+                gameOverImage = this.add.sprite(400, 300, 'gameOver'); //j'affiche mon image gameOver
+                gameOverImage.setScrollFactor(0);
+                garlics.children.entries.map(garlic => garlic.disableBody(true, true))
+                bloods.children.entries.map(blood => blood.disableBody(true, true))
             }
 
-            if (cursors.left.isDown) {
-                vampire.setVelocityX(-160);
+            // Quand je presse ENTER (=rejouer) :
+            if (etat == 3 && enter.isDown) {
+                gameOverImage.visible = false; //gameOverImage disparaît
+                this.physics.resume(); //j'appelle la méthode pour annuler la pause
+                etat = 2;
+                score = 0; //le score revient à 0...
+                scoreText.setText('Score: ' + score); //...et je l'affiche
+                vampire.setPosition(65, 300);
+                pumpkins = this.physics.add.staticGroup({ //j'affiche 3 pumpkins
+                    key: 'pumpkin',
+                    repeat: 2,
+                    setXY: {
+                        x: 650,
+                        y: 40,
+                        stepX: 50
+                    }
+                });
+
+                // Fix pumpkins on top right of the screen
+                pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
+                
+                // Faire réapparaître toutes les gouttes de sang
+                bloods.children.iterate(function (child) {
+                    child.enableBody(true, child.x, 0, true, true);
+                });
+
+            }
+
+            // Set directions
+            if (deadAnim) {
+                vampire.anims.play('dead', true);
+                if (cursors.right.isDown) {
+                    deadAnim = false
+                } else if (cursors.up.isDown) {
+                    deadAnim = false
+                } else if (cursors.left.isDown) {
+                    deadAnim = false
+                }
+            } else if (cursors.left.isDown) {
+                vampire.setVelocityX(-300);
 
                 vampire.anims.play('left', true);
             } else if (cursors.right.isDown) {
-                vampire.setVelocityX(160);
+                vampire.setVelocityX(300);
 
                 vampire.anims.play('right', true);
             } else {
@@ -289,74 +424,80 @@
 
         }
 
-        function collectStar(vampire, star) {
-            star.disableBody(true, true);
+
+        function collectBlood(vampire, blood) {
+            bloodCount++;
+
+            // Delete the touched blood
+            blood.disableBody(true, true);
 
             //  Add and update the score
             score += 10;
             scoreText.setText('Score: ' + score);
             nameText.setText('Player: ' + recordedName);
 
-
-            if (stars.countActive(true) === 0) {
-                //  A new batch of stars to collect
-                stars.children.iterate(function (child) {
-
+            //  A new batch of bloods to collect if there is no blood anymore
+            if (bloods.countActive(true) === 0) {
+                bloods.children.iterate(function (child) {
                     child.enableBody(true, child.x, 0, true, true);
-
                 });
+                bloodCount = 0;
+            }
 
-                var x = (vampire.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+            // Where my vampire goes at each new game
+            if (bloodCount % 4 === 0) {
 
-                var bomb = bombs.create(x, 16, 'bomb');
-                bomb.setBounce(1);
-                bomb.setCollideWorldBounds(true);
-                bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-                bomb.allowGravity = false;
+                var x = vampire.x;
+                if (x - 600 < 0) {
+                    x = Phaser.Math.Between(0, 600)
+                } else if (x + 600 > 2500) {
+                    x = Phaser.Math.Between(1900, 2500)
+                } else {
+                    x = Phaser.Math.Between(x - 300, x + 300)
+                }
+
+                var garlic = garlics.create(x, 16, 'garlic');
+                garlic.setBounce(1);
+                garlic.setCollideWorldBounds(true);
+                garlic.setVelocity(Phaser.Math.Between(-200, 200), 20);
+                garlic.allowGravity = false;
 
             }
+
         }
 
-        function hitBomb(vampire, bomb) {
-            if (bomb) {
-                bomb.disableBody(true, true);
-                bomb === false;
+        function hitGarlic(vampire, garlic) {
+
+            if (garlic) {
+                deadAnim = true
+                // Disable garlic if touched
+                garlic.disableBody(true, true);
+                garlic === false;
             }
 
-            // Tant qu'il reste des lives, si on touche une bombe, une live disparaît
+            // Tant qu'il reste des pumpkins, si on touche un ail, une pumpkin disparaît
             live = pumpkins.getFirstAlive();
 
             if (live) {
                 live.disableBody(true, true);
                 live === false;
             }
-            //this.physics.pause();
-
-            //vampire.setTint('blue');
-
-            //vampire.anims.play('turn');
-
-            //gameOver = true;
 
         }
 
-        // function change_class() {
-        //     var btn = document.getElementById("btnTest");
-        //     btn.className = "buttonType2";
-
-        // }
         button.addEventListener("click", function (event) {
             event.preventDefault()
             recordedName = input.value;
-            return etat = 2;
+            if (recordedName.length > 2) {
 
-        }, );
+                return etat = 2;
+            }
+        })
 
     </script>
 
 
 
 </body>
-
 
 </html>
