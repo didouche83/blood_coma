@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Blood coma</title>
+    <link rel="icon" href="assets/favicon.ico" />
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
     <style type='text/css'>
@@ -13,37 +14,56 @@
         }
 
         .invisible {
-            margin-top: 130px;
-            margin-left: 200px;
+            margin-top: 140px;
+            margin-left: 220px;
             z-index: 1;
             position: absolute;
-            width: 300px;
+            width: 330px;
             height: 40px;
             border-radius: 10px;
+            background: url('assets/input_background.png');
+            font-size: 17px;
+            font-weight: bold;
+            color:brown;
+            font-style: italic;
+
+        }
+
+        .invisible:invalid {
+            border: 2px solid brown;
         }
 
         .validationName {
-            margin-top: 160px;
-            margin-left: 335px;
+            margin-top: 220px;
+            margin-left: 305px;
             z-index: 1;
             position: absolute;
-            width: 200px;
-            height: 50px;
-            background:url('assets/accueil.png');
+            width: 150px;
+            height: 30px;
+            background: url('assets/button_background.png');
             border: none;
             cursor: pointer;
+            border-radius: 10px;
+            transition: 0.7s;
+            font-weight: bold;
+            font-size: 17px;
 
         }
 
         .validationName:hover {
-            /* background: url("btnImgHover.gif") no-repeat left bottom; */
-            background: orange;
+            background: url("assets/smoke.gif") right top ;
+            color: white;
         }
 
-        :required {
-            border: 2px orange; 
+        .invisible:focus {
+            background: white
         }
-        /* //dotted */
+
+        /* :required {
+            border: 2px orange; 
+            required pattern="[A-Za-z]{3}"
+        }
+        //dotted */
 
     </style>
 
@@ -51,11 +71,13 @@
 
 <body>
 
-    <form method="post" id="invisible">
-        <input type="text" placeholder="Write your vampire name here" id='inputText' required="required" class="invisible">
-        <input type="button" class='validationName' id="button" type="submit">
+<div>
+    <form method="post" id="invisible" action="index.php">
+        <input type="text" placeholder=" Write your vampire name here" id='inputText' class="invisible" data-message="Please enter 3 letters minimum"
+            minlength="3" required />
+        <input class='validationName' id="button" type="submit" value="Begin !"/>
     </form>
-
+</div>
     <script type="text/javascript">
         var config = {
             type: Phaser.AUTO,
@@ -112,7 +134,7 @@
             this.load.image('garlic', 'assets/ail.png');
             this.load.image('pumpkin', 'assets/pumpkin.png')
             this.load.image('sky', 'assets/bloodcoma.png');
-            this.load.image('name_page', 'assets/name_page_name9.png');
+            this.load.image('name_page', 'assets/name_page.png');
             this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
 
 
@@ -248,7 +270,11 @@
             bloods = this.physics.add.group({
                 key: 'blood',
                 repeat: 27,
-                setXY: { x: 100, y: 0, stepX: 80 }
+                setXY: {
+                    x: 100,
+                    y: 0,
+                    stepX: 80
+                }
             });
 
             bloods.children.iterate(function (child) {
@@ -426,11 +452,9 @@
                 var x = vampire.x;
                 if (x - 600 < 0) {
                     x = Phaser.Math.Between(0, 600)
-                }
-                else if (x + 600 > 2500) {
+                } else if (x + 600 > 2500) {
                     x = Phaser.Math.Between(1900, 2500)
-                }
-                else {
+                } else {
                     x = Phaser.Math.Between(x - 300, x + 300)
                 }
 
@@ -469,12 +493,11 @@
         button.addEventListener("click", function (event) {
             event.preventDefault()
             recordedName = input.value;
-            if (recordedName != ""){
+            if (recordedName.length > 2) {
 
-            return etat = 2;
+                return etat = 2;
             }
-        }
-        )
+        })
 
     </script>
 
