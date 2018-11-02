@@ -359,10 +359,14 @@
             if (etat == 0) {
                 accueil.visible = true;
                 input.style.display = 'none';
-                button.style.display = 'none'
+                button.style.display = 'none';
+                pause = this.add.sprite(400, 300, 'pause');
+                pause.visible = false;
+
 
             } else if (etat == 1) {
                 accueil.visible = false;
+                pause.visible = false;
                 input.style.display = 'block'
                 button.style.display = 'block'
                 input.style.zIndex = "2";
@@ -373,10 +377,12 @@
                 input.style.display = 'none';
                 button.style.display = 'none';
                 pause_button.style.zIndex = "2";
+                pause.visible = false;
+            } else if (etat == 3){
+                pause.visible = false;
 
             } else if (etat == 4) {
                 this.physics.pause();
-                pause = this.add.sprite(400, 300, 'pause');
                 pause.visible = true;
             }
 
