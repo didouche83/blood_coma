@@ -61,7 +61,7 @@
         .pause_button {
             width: 40px;
             height: 40px;
-            background: url("assets/Pause1.png");
+            background: url("assets/button_pause.png");
             font: bold 13px Arial;
             border-radius: 50%;
             border: none;
@@ -157,7 +157,7 @@
             this.load.image('pumpkin', 'assets/pumpkin.png')
             this.load.image('sky', 'assets/bloodcoma.png');
             this.load.image('name_page', 'assets/name_page.png');
-            this.load.image('pause', 'assets/cercueil5.png');
+            this.load.image('pause', 'assets/coffin.png');
             this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
             this.load.audio('gameOverMusic', 'assets/audio/You-lose-sound-effect.mp3');
             this.load.audio('garlicSound', 'assets/audio/garlic_sound.mp3');
@@ -186,7 +186,7 @@
             });
 
             this.load.image('accueil', 'assets/accueil.png');
-            this.load.image('gameOver', 'assets/vampire_bad3.png');
+            this.load.image('gameOver', 'assets/gameOver_image.png');
         }
 
         function create() {
@@ -378,12 +378,20 @@
                 button.style.display = 'none';
                 pause_button.style.zIndex = "2";
                 pause.visible = false;
+                pause_button.style.display = 'block';
+
+
             } else if (etat == 3){
                 pause.visible = false;
+                pause_button.style.display = 'none';
+
 
             } else if (etat == 4) {
                 this.physics.pause();
                 pause.visible = true;
+                pause.setScrollFactor(0);
+                pause_button.style.display = 'none';
+                
             }
 
 
