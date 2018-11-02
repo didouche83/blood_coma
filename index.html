@@ -92,6 +92,7 @@
         </form>
         <button class="pause_button" type="submit" id="pause_button"></button>
     </div>
+  
     <script type="text/javascript">
         var config = {
             type: Phaser.AUTO,
@@ -148,7 +149,14 @@
         const button = document.getElementById('button');
         const input = document.getElementById('inputText');
         var game = new Phaser.Game(config);
-
+        document.onload = function()
+{
+  setTimeout(function()
+  {
+      console.log('invisible')
+    window.getElementById("together").style.display = "none";
+  }, 2000);
+}
         function preload() {
             this.load.image('floor', 'assets/floor.png');
             this.load.image('ground', 'assets/platform.png');
@@ -394,7 +402,6 @@
                 
             }
 
-
             //Quand on appuie sur entrer, on arrive sur la page name (état 1)
             if (etat == 0 && enter.isDown) {
                 return etat = 1;
@@ -555,8 +562,6 @@
         })
 
     </script>
-
-
 
 </body>
 
