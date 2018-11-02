@@ -8,6 +8,7 @@
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <!-- <script src="node_modules/@orange-games/phaser-input/build/phaser-input.js"></script> -->
     <style type='text/css'>
+
         canvas {
             position: relative;
             z-index: 1;
@@ -62,7 +63,6 @@
             width: 40px;
             height: 40px;
             background: url("assets/button_pause.png");
-            font: bold 13px Arial;
             border-radius: 50%;
             border: none;
             cursor: pointer;
@@ -311,18 +311,21 @@
             // The garlics
             garlics = this.physics.add.group();
 
-            //  The score
-            scoreText = this.add.text(16, 16, 'Score: 0', {
+
+            // Pour que le nom du joueur s'affiche en haut à gauche
+            nameText = this.add.text(16, 16, 'Player: ', {
                 fontSize: '32px',
-                fill: 'red'
+                fill: 'brown'
+            });
+            // et qu'il reste malgré la caméra qui avance
+            nameText.setScrollFactor(0);
+
+            //  The score
+            scoreText = this.add.text(16, 50, 'Score: 0', {
+                fontSize: '32px',
+                fill: 'brown'
             });
             scoreText.setScrollFactor(0);
-
-            nameText = this.add.text(16, 50, 'Player: ', {
-                fontSize: '32px',
-                fill: 'red'
-            });
-            nameText.setScrollFactor(0);
 
             //  Collide the vampire and the bloods with the platforms
             this.physics.add.collider(vampire, platforms);
@@ -356,7 +359,7 @@
 
         function update() {
 
-            if (etat == 0) {
+            if (etat == 0) { //page d'accueil
                 accueil.visible = true;
                 input.style.display = 'none';
                 button.style.display = 'none';
@@ -364,7 +367,7 @@
                 pause.visible = false;
 
 
-            } else if (etat == 1) {
+            } else if (etat == 1) { //name_page
                 accueil.visible = false;
                 pause.visible = false;
                 input.style.display = 'block'
@@ -372,28 +375,27 @@
                 input.style.zIndex = "2";
                 button.style.zIndex = "2";
 
-            } else if (etat == 2) {
+            } else if (etat == 2) { //page du jeu
                 name_page.visible = false;
                 input.style.display = 'none';
                 button.style.display = 'none';
                 pause_button.style.zIndex = "2";
                 pause.visible = false;
                 pause_button.style.display = 'block';
+                nameText.setText('Player: ' + recordedName);
 
 
-            } else if (etat == 3){
+            } else if (etat == 3){ //gameOver
                 pause.visible = false;
                 pause_button.style.display = 'none';
 
 
-            } else if (etat == 4) {
+            } else if (etat == 4) { //pause_page
                 this.physics.pause();
                 pause.visible = true;
                 pause.setScrollFactor(0);
                 pause_button.style.display = 'none';
-                
             }
-
 
             //Quand on appuie sur entrer, on arrive sur la page name (état 1)
             if (etat == 0 && enter.isDown) {
@@ -443,7 +445,7 @@
 
             }
 
-            if (etat == 4 && enter.isDown) {
+            if (etat == 4 && enter.isDown) { //si j'appuie sur entrée pour quitter la pause
                 pause.visible = false;
                 this.physics.resume();
                 etat = 2;
@@ -489,7 +491,6 @@
             //  Add and update the score
             score += 10;
             scoreText.setText('Score: ' + score);
-            nameText.setText('Player: ' + recordedName);
 
             //  A new batch of bloods to collect if there is no blood anymore
             if (bloods.countActive(true) === 0) {
@@ -540,7 +541,7 @@
             }
 
         }
-
+        //on surveille le bouton "begin!" pour qu'au clic on enregistre la valeur du nom et on autorise le jeu si le nom est > 2 lettres
         button.addEventListener("click", function (event) {
             event.preventDefault()
             recordedName = input.value;
@@ -550,7 +551,7 @@
             }
         })
 
-        pause_button.addEventListener("click", function (event) {
+        pause_button.addEventListener("click", function (event) { //on surveille le bouton pause pour passer à l'étape 4, la page pause
             return etat = 4;
         })
 
