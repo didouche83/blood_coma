@@ -11,8 +11,6 @@
         canvas {
             position: relative;
             z-index: 1;
-
-
         }
 
         .invisible {
@@ -61,7 +59,7 @@
         }
 
         /* :required {
-            border: 2px orange; 
+            border: 2px orange;
             required pattern="[A-Za-z]{3}"
         }
         //dotted */
@@ -113,7 +111,7 @@
         var score = 0;
         var text;
         var recordedName;
-        
+
         // Elements principaux
         var vampire;
         var deadAnim = false;
@@ -125,7 +123,8 @@
         // Elements paysage, decor et ambiance
         var map;
         var platforms;
-        var music
+        var music;
+        var gameOverMusic;
 
         // Autres éléments
         var cursors;
@@ -142,6 +141,7 @@
             this.load.image('sky', 'assets/bloodcoma.png');
             this.load.image('name_page', 'assets/name_page.png');
             this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
+            this.load.audio('gameOverMusic', 'assets/audio/You-lose-sound-effect.mp3');
 
             // map made with Tiled in JSON format
             // this.load.tilemapTiledJSON('map', 'assets/map.json');
@@ -177,6 +177,7 @@
 
             // Adding some music dude
             music = this.sound.add('halloweenMusic');
+            gameOverMusic = this.sound.add('gameOverMusic');
             music.play();
 
             // Groupe statique de 3 pumpkins espacées de 50px
@@ -352,6 +353,10 @@
                 input.style.display = 'none';
                 button.style.display = 'none';
             }
+            // else if (etat == 3){
+            //     music.resume();
+            //     gameOverMusic.play();
+            // }
 
             //Quand on appuie sur entrer, on arrive sur la page name (état 1)
             if (etat == 0 && enter.isDown) {
@@ -363,6 +368,8 @@
                 etat = 3;
                 this.physics.pause(); //Je mets le jeu en pause
                 gameOver = true;
+                music.pause();
+                gameOverMusic.play();
                 gameOverImage = this.add.sprite(400, 300, 'gameOver'); //j'affiche mon image gameOver
                 gameOverImage.setScrollFactor(0);
                 garlics.children.entries.map(garlic => garlic.disableBody(true, true))
@@ -386,6 +393,8 @@
                         stepX: 50
                     }
                 });
+                gameOverMusic.pause();
+                music.play();
 
                 // Fix pumpkins on top right of the screen
                 pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
