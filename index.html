@@ -125,6 +125,7 @@
         var platforms;
         var music;
         var gameOverMusic;
+        var garlicSound;
 
         // Autres éléments
         var cursors;
@@ -142,6 +143,7 @@
             this.load.image('name_page', 'assets/name_page.png');
             this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
             this.load.audio('gameOverMusic', 'assets/audio/You-lose-sound-effect.mp3');
+            this.load.audio('garlicSound', 'assets/audio/garlic_sound.mp3');
 
             // map made with Tiled in JSON format
             // this.load.tilemapTiledJSON('map', 'assets/map.json');
@@ -178,6 +180,7 @@
             // Adding some music dude
             music = this.sound.add('halloweenMusic');
             gameOverMusic = this.sound.add('gameOverMusic');
+            garlicSound = this.sound.add('garlicSound');
             music.play();
 
             // Groupe statique de 3 pumpkins espacées de 50px
@@ -485,6 +488,7 @@
                 // Disable garlic if touched
                 garlic.disableBody(true, true);
                 garlic === false;
+                garlicSound.play();
             }
 
             // Tant qu'il reste des pumpkins, si on touche un ail, une pumpkin disparaît
