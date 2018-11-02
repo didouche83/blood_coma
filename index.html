@@ -127,6 +127,7 @@
         var score = 0;
         var text;
         var recordedName;
+        var nameCharOk;
 
         // Elements principaux
         var vampire;
@@ -382,7 +383,7 @@
                 pause_button.style.zIndex = "2";
                 pause.visible = false;
                 pause_button.style.display = 'block';
-                nameText.setText('Player: ' + recordedName);
+                nameText.setText('Player: ' + nameCharOk);
 
 
             } else if (etat == 3){ //gameOver
@@ -545,6 +546,7 @@
         button.addEventListener("click", function (event) {
             event.preventDefault()
             recordedName = input.value;
+            nameCharOk = recordedName.charAt(0).toUpperCase() + recordedName.slice(1).toLowerCase(); //pour avoir un nom ac 1ere lettre en maj sur le jeu
             if (recordedName.length > 2) {
 
                 return etat = 2;
