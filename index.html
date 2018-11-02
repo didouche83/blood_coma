@@ -23,7 +23,7 @@
             background: url('assets/input_background.png');
             font-size: 17px;
             font-weight: bold;
-            color:brown;
+            color: brown;
             font-style: italic;
 
         }
@@ -50,13 +50,27 @@
         }
 
         .validationName:hover {
-            background: url("assets/smoke.gif") right top ;
+            background: url("assets/smoke.gif") right top;
             color: white;
         }
 
         .invisible:focus {
             background: white
         }
+
+        .pause_button {
+            width: 40px;
+            height: 40px;
+            background: url("assets/Pause1.png");
+            font: bold 13px Arial;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            margin-top: 550px;
+            margin-left: 750px;
+        }
+
 
         /* :required {
             border: 2px orange;
@@ -70,13 +84,14 @@
 
 <body>
 
-<div>
-    <form method="post" id="invisible" action="index.php">
-        <input type="text" placeholder=" Write your vampire name here" id='inputText' class="invisible" data-message="Please enter 3 letters minimum"
-            minlength="3" required />
-        <input class='validationName' id="button" type="submit" value="Begin !"/>
-    </form>
-</div>
+    <div>
+        <form method="post" id="invisible" action="index.php">
+            <input type="text" placeholder=" Write your vampire name here" id='inputText' class="invisible"
+                data-message="Please enter 3 letters minimum" minlength="3" required />
+            <input class='validationName' id="button" type="submit" value="Begin !" />
+        </form>
+        <button class="pause_button" type="submit" id="pause_button"></button>
+    </div>
     <script type="text/javascript">
         var config = {
             type: Phaser.AUTO,
@@ -102,6 +117,7 @@
         var accueil;
         var gameOver = false;
         var gameOverImage;
+        var pause;
 
         // Elements texte
         var name_page;
@@ -141,6 +157,7 @@
             this.load.image('pumpkin', 'assets/pumpkin.png')
             this.load.image('sky', 'assets/bloodcoma.png');
             this.load.image('name_page', 'assets/name_page.png');
+            this.load.image('pause', 'assets/cercueil5.png');
             this.load.audio('halloweenMusic', 'assets/audio/halloweenMusic.mp3'); //ajouter music ogg pour firefox
             this.load.audio('gameOverMusic', 'assets/audio/You-lose-sound-effect.mp3');
             this.load.audio('garlicSound', 'assets/audio/garlic_sound.mp3');
@@ -193,7 +210,7 @@
                     stepX: 50
                 }
             });
-            
+
             // Fix pumpkins on top right of the screen
             if (pumpkins) {
                 pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
@@ -355,11 +372,14 @@
                 name_page.visible = false;
                 input.style.display = 'none';
                 button.style.display = 'none';
+                pause_button.style.zIndex = "2";
+
+            } else if (etat == 4) {
+                this.physics.pause();
+                pause = this.add.sprite(400, 300, 'pause');
+                pause.visible = true;
             }
-            // else if (etat == 3){
-            //     music.resume();
-            //     gameOverMusic.play();
-            // }
+
 
             //Quand on appuie sur entrer, on arrive sur la page name (état 1)
             if (etat == 0 && enter.isDown) {
@@ -401,12 +421,18 @@
 
                 // Fix pumpkins on top right of the screen
                 pumpkins.children.entries.map(pump => pump.setScrollFactor(0))
-                
+
                 // Faire réapparaître toutes les gouttes de sang
                 bloods.children.iterate(function (child) {
                     child.enableBody(true, child.x, 0, true, true);
                 });
 
+            }
+
+            if (etat == 4 && enter.isDown) {
+                pause.visible = false;
+                this.physics.resume();
+                etat = 2;
             }
 
             // Set directions
@@ -508,6 +534,10 @@
 
                 return etat = 2;
             }
+        })
+
+        pause_button.addEventListener("click", function (event) {
+            return etat = 4;
         })
 
     </script>
